@@ -4,6 +4,7 @@
 /make-linux.sh -text
 /make-mingw.bat -text
 /make-os-x.sh -text
+release/COPYING.txt -text
 release/SDL2.dll -text
 release/help.txt -text
 release/protracker-osx.app/Contents/Frameworks/SDL2.framework/Headers -text
