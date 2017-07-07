@@ -105,6 +105,8 @@ src/pt_terminal.c -text
 src/pt_terminal.h -text
 src/pt_textout.c -text
 src/pt_textout.h -text
+src/pt_unicode.c -text
+src/pt_unicode.h -text
 src/pt_visuals.c -text
 src/pt_visuals.h -text
 vs2015_project/pt-clone.sln -text
