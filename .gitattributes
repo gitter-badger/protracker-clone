@@ -100,6 +100,8 @@ src/pt_sampleloader.c -text
 src/pt_sampleloader.h -text
 src/pt_sampler.c -text
 src/pt_sampler.h -text
+src/pt_scopes.c -text
+src/pt_scopes.h -text
 src/pt_tables.c -text
 src/pt_tables.h -text
 src/pt_terminal.c -text
