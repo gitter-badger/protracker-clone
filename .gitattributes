@@ -8,13 +8,7 @@
 release/COPYING.txt -text
 release/SDL2.dll -text
 release/help.txt -text
-release/protracker-osx.app/Contents/Frameworks/SDL2.framework/Headers -text
-release/protracker-osx.app/Contents/Frameworks/SDL2.framework/Resources -text
-release/protracker-osx.app/Contents/Frameworks/SDL2.framework/SDL2 -text
-release/protracker-osx.app/Contents/Frameworks/SDL2.framework/Versions/A/Resources/Info.plist -text
 release/protracker-osx.app/Contents/Frameworks/SDL2.framework/Versions/A/SDL2 -text
-release/protracker-osx.app/Contents/Frameworks/SDL2.framework/Versions/A/_CodeSignature/CodeResources -text
-release/protracker-osx.app/Contents/Frameworks/SDL2.framework/Versions/Current -text
 release/protracker-osx.app/Contents/Info.plist -text
 release/protracker-osx.app/Contents/PkgInfo -text
 release/protracker-osx.app/Contents/Resources/protracker.icns -text
@@ -136,6 +130,16 @@ vs_sdl_include/include/SDL2/SDL_bits.h -text
 vs_sdl_include/include/SDL2/SDL_blendmode.h -text
 vs_sdl_include/include/SDL2/SDL_clipboard.h -text
 vs_sdl_include/include/SDL2/SDL_config.h -text
+vs_sdl_include/include/SDL2/SDL_config_android.h -text
+vs_sdl_include/include/SDL2/SDL_config_iphoneos.h -text
+vs_sdl_include/include/SDL2/SDL_config_macosx.h -text
+vs_sdl_include/include/SDL2/SDL_config_minimal.h -text
+vs_sdl_include/include/SDL2/SDL_config_pandora.h -text
+vs_sdl_include/include/SDL2/SDL_config_psp.h -text
+vs_sdl_include/include/SDL2/SDL_config_windows.h -text
+vs_sdl_include/include/SDL2/SDL_config_winrt.h -text
+vs_sdl_include/include/SDL2/SDL_config_wiz.h -text
+vs_sdl_include/include/SDL2/SDL_copying.h -text
 vs_sdl_include/include/SDL2/SDL_cpuinfo.h -text
 vs_sdl_include/include/SDL2/SDL_egl.h -text
 vs_sdl_include/include/SDL2/SDL_endian.h -text
@@ -189,6 +193,7 @@ vs_sdl_include/include/SDL2/SDL_test_harness.h -text
 vs_sdl_include/include/SDL2/SDL_test_images.h -text
 vs_sdl_include/include/SDL2/SDL_test_log.h -text
 vs_sdl_include/include/SDL2/SDL_test_md5.h -text
+vs_sdl_include/include/SDL2/SDL_test_memory.h -text
 vs_sdl_include/include/SDL2/SDL_test_random.h -text
 vs_sdl_include/include/SDL2/SDL_thread.h -text
 vs_sdl_include/include/SDL2/SDL_timer.h -text
@@ -196,6 +201,7 @@ vs_sdl_include/include/SDL2/SDL_touch.h -text
 vs_sdl_include/include/SDL2/SDL_types.h -text
 vs_sdl_include/include/SDL2/SDL_version.h -text
 vs_sdl_include/include/SDL2/SDL_video.h -text
+vs_sdl_include/include/SDL2/SDL_vulkan.h -text
 vs_sdl_include/include/SDL2/begin_code.h -text
 vs_sdl_include/include/SDL2/close_code.h -text
 vs_sdl_include/lib/SDL2.lib -text
