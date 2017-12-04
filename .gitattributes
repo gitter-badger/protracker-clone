@@ -8,6 +8,7 @@
 release/COPYING.txt -text
 release/SDL2.dll -text
 release/help.txt -text
+release/protracker-osx.app/Contents/Frameworks/SDL2.framework/Versions/A/Resources/Info.plist -text
 release/protracker-osx.app/Contents/Frameworks/SDL2.framework/Versions/A/SDL2 -text
 release/protracker-osx.app/Contents/Info.plist -text
 release/protracker-osx.app/Contents/PkgInfo -text
