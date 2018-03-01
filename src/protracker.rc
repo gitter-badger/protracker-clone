@@ -14,7 +14,6 @@ BEGIN
             VALUE "ProductVersion",   "Beta"
             VALUE "InternalName",     "ProTracker v2.3D clone"
             VALUE "LegalCopyright",   "Copyright © Olav ""8bitbubsy"" Sørensen"
-            VALUE "OriginalFilename", "protracker.exe"
         END
     END
 
