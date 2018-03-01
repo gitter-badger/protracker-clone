@@ -57,7 +57,6 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>NDEBUG;WIN32;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;HAVE_M_PI</PreprocessorDefinitions>
-      <CompileAs>CompileAsC</CompileAs>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -71,6 +70,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,8 +91,9 @@
       <DataExecutionPrevention>false</DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
-      <Command>xp_pe_patch "..\..\release\protracker.exe" -nb</Command>
-      <Message>Patches the release binary to run on Windows XP</Message>
+      <Command>..\..\bintools\xp_pe_patch.exe "..\..\release\protracker.exe" -nb
+..\..\bintools\upx.exe "..\..\release\protracker.exe"</Command>
+      <Message>Patches the release binary to run on Windows XP, then compresses the binary with UPX</Message>
     </PostBuildEvent>
     <Manifest>
       <VerboseOutput>false</VerboseOutput>
@@ -102,10 +103,10 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>DEBUG;WIN32;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;HAVE_M_PI</PreprocessorDefinitions>
-      <CompileAs>CompileAsC</CompileAs>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ExceptionHandling>false</ExceptionHandling>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

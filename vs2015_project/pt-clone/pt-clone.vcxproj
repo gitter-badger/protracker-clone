@@ -57,7 +57,6 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <PreprocessorDefinitions>NDEBUG;WIN32;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;HAVE_M_PI</PreprocessorDefinitions>
-      <CompileAs>CompileAsC</CompileAs>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -70,7 +69,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Fast</FloatingPointModel>    
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -91,8 +90,9 @@
       <DataExecutionPrevention>false</DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
-      <Command>xp_pe_patch "..\..\release\protracker.exe" -nb</Command>
-      <Message>Patches the release binary to run on Windows XP</Message>
+      <Command>..\..\bintools\xp_pe_patch.exe "..\..\release\protracker.exe" -nb
+..\..\bintools\upx.exe "..\..\release\protracker.exe"</Command>
+      <Message>Patches the release binary to run on Windows XP, then compresses the binary with UPX</Message>
     </PostBuildEvent>
     <Manifest>
       <VerboseOutput>false</VerboseOutput>
@@ -102,7 +102,6 @@
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
       <PreprocessorDefinitions>DEBUG;WIN32;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;HAVE_M_PI</PreprocessorDefinitions>
-      <CompileAs>CompileAsC</CompileAs>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ExceptionHandling>false</ExceptionHandling>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
@@ -147,7 +146,9 @@
     <ClCompile Include="..\..\src\gfx\pt_gfx_tracker.c" />
     <ClCompile Include="..\..\src\gfx\pt_gfx_vumeter.c" />
     <ClCompile Include="..\..\src\gfx\pt_gfx_yes_no_dialog.c" />
+    <ClCompile Include="..\..\src\pt_scopes.c" />
     <ClCompile Include="..\..\src\pt_terminal.c" />
+    <ClCompile Include="..\..\src\pt_unicode.c" />
     <ClCompile Include="..\..\src\pt_visuals.c" />
     <ClInclude Include="..\..\src\pt_audio.h" />
     <ClInclude Include="..\..\src\pt_blep.h" />
@@ -186,10 +187,8 @@
     <ClCompile Include="..\..\src\pt_patternviewer.c" />
     <ClCompile Include="..\..\src\pt_sampleloader.c" />
     <ClCompile Include="..\..\src\pt_sampler.c" />
-    <ClCompile Include="..\..\src\pt_scopes.c" />
     <ClCompile Include="..\..\src\pt_tables.c" />
     <ClCompile Include="..\..\src\pt_textout.c" />
-    <ClCompile Include="..\..\src\pt_unicode.c" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

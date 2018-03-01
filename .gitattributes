@@ -1,5 +1,8 @@
 * text=auto !eol
 /GNUmakefile -text
+bintools/LICENSE -text
+bintools/upx.exe -text
+bintools/xp_pe_patch.exe -text
 /compiling.txt -text
 /make-freebsd.sh -text
 /make-linux.sh -text
@@ -187,14 +190,12 @@ vs2015_project/pt-clone/SDL2.dll -text
 vs2015_project/pt-clone/protracker.ini -text
 vs2015_project/pt-clone/pt-clone.vcxproj -text
 vs2015_project/pt-clone/pt-clone.vcxproj.filters -text
-vs2015_project/pt-clone/xp_pe_patch.exe -text
 vs2017_project/pt-clone.sln -text
 vs2017_project/pt-clone/SDL2.dll -text
 vs2017_project/pt-clone/protracker.ini -text
 vs2017_project/pt-clone/pt-clone.vcxproj -text
 vs2017_project/pt-clone/pt-clone.vcxproj.filters -text
 vs2017_project/pt-clone/pt-clone.vcxproj.user -text
-vs2017_project/pt-clone/xp_pe_patch.exe -text
 vs_sdl_include/COPYING.txt -text
 vs_sdl_include/README-SDL.txt -text
 vs_sdl_include/README.txt -text
