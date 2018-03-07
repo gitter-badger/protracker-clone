@@ -83,6 +83,11 @@ mingw_sdl_include/include/SDL2/SDL_video.h -text
 mingw_sdl_include/include/SDL2/SDL_vulkan.h -text
 mingw_sdl_include/include/SDL2/begin_code.h -text
 mingw_sdl_include/include/SDL2/close_code.h -text
+mingw_sdl_include/lib/libSDL2.a -text
+mingw_sdl_include/lib/libSDL2.dll.a -text
+mingw_sdl_include/lib/libSDL2.la -text
+mingw_sdl_include/lib/libSDL2main.a -text
+mingw_sdl_include/lib/libSDL2main.la -text
 release/COPYING.txt -text
 release/SDL2.dll -text
 release/help.txt -text

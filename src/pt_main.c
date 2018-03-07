@@ -96,8 +96,8 @@ int main(int argc, char *argv[])
     bigEndian = endianTest.b[3];
     // ----------------------------
 
-#if SDL_PATCHLEVEL <= 4
-    #pragma message("WARNING: The SDL2 dev lib is older than ver 2.0.5. You'll get fullscreen mode bugs.")
+#if SDL_PATCHLEVEL < 5
+    #pragma message("WARNING: The SDL2 dev lib is older than ver 2.0.5. You'll get fullscreen mode issues.")
 #endif
 
     SDL_GetVersion(&sdlVer);
