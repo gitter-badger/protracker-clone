@@ -53,7 +53,7 @@ int8_t loadConfig(void)
     ptConfig.dottedCenterFlag  = true;
     ptConfig.a500LowPassFilter = false;
     ptConfig.soundFrequency    = 48000;
-    ptConfig.stereoSeparation  = 15;
+    ptConfig.stereoSeparation  = 19;
     ptConfig.videoScaleFactor  = 2;
     ptConfig.blepSynthesis     = true;
     ptConfig.realVuMeters      = false;
