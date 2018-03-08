@@ -238,7 +238,7 @@ void drawScopes(void)
                         else if (readPos >= dataLen)
                         {
                             // readPtr = sampleStartPtr, wrap readPos to loop start
-                            readPos  = loopStart;
+                            readPos = loopStart;
                         }
 
                         monoScopeBuffer[x] += (readPtr[readPos++] * volume);

@@ -165,9 +165,9 @@ static void setDragBar(void)
             for (x = 4; x < 316; ++x)
             {
                 if ((x >= editor.sampler.dragStart) && (x <= editor.sampler.dragEnd))
-                    dstPtr[x] = pixel;   /* drag bar */
+                    dstPtr[x] = pixel;   // drag bar
                 else
-                    dstPtr[x] = bgPixel; /* background */
+                    dstPtr[x] = bgPixel; // background
             }
 
             dstPtr += SCREEN_W;

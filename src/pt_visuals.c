@@ -986,7 +986,7 @@ void removeTextEditMarker(void)
 
         if ((editor.ui.editObject == PTB_PE_PATT) || (editor.ui.editObject == PTB_PE_PATTNAME))
         {
-            /* position editor text editing */
+            // position editor text editing
 
             pixel = palette[PAL_GENBKG2];
             for (y = 0; y < 2; ++y)
@@ -1002,7 +1002,7 @@ void removeTextEditMarker(void)
         }
         else
         {
-            /* all others */
+            // all others
 
             pixel = palette[PAL_GENBKG];
             for (y = 0; y < 2; ++y)

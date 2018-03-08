@@ -407,7 +407,7 @@ void keyDownHandler(SDL_Scancode keyEntry, SDL_Keycode keyCode)
     {
         toggleFullscreen();
 
-        /* hack for a bug in certain SDL2 Linux ports */
+        // hack for a bug in certain SDL2 Linux ports
 #ifdef __unix__
         SDL_Delay(150);
 #endif

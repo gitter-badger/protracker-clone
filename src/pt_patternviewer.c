@@ -154,21 +154,6 @@ void drawPatternNormal(uint32_t *frameBuffer)
 
         memcpy(dstPtr, srcPtr, (SCREEN_W * sizeof (int32_t)) * h);
     }
-
-    /*
-    if (modEntry->currRow <= 6)
-    {
-        y2 = 140 + ((7 -  modEntry->currRow) * 7);
-        for (y = 140; y < y2; y += 7)
-            textOutBgNoSpace(frameBuffer, 9, y, "00 --000000 --000000 --000000 --000000", palette[PAL_BACKGRD], palette[PAL_BACKGRD]);
-    }
-    else if (modEntry->currRow >= 57)
-    {
-        y2 = 245 - ((modEntry->currRow - 56) * 7);
-        for (y = 245; y > y2; y -= 7)
-            textOutBgNoSpace(frameBuffer, 9, y, "00 --000000 --000000 --000000 --000000", palette[PAL_BACKGRD], palette[PAL_BACKGRD]);
-    }
-    */
 }
 
 void drawPatternDotted(uint32_t *frameBuffer)
