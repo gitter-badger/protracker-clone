@@ -101,36 +101,36 @@ void drawScopes(void)
     uint8_t i, y, totalVoicesActive, didSwapData;
     int16_t scopeData;
     int32_t x, readPos, monoScopeBuffer[MONOSCOPE_WIDTH], scopeTemp, dataLen, loopStart;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst, *scopePtr, scopePixel;
+    uint32_t *dstPtr, *scopePtr, scopePixel;
     scopeChannel_t *sc;
-
-    scopePixel = palette[PAL_QADSCP];
 
     if (editor.ui.visualizerMode == VISUAL_QUADRASCOPE)
     {
         // -- quadrascope --
-        scopePtr = pixelBuffer + ((71 * SCREEN_W) + 128);
+        scopePtr = &pixelBuffer[(71 * SCREEN_W) + 128];
 
         for (i = 0; i < AMIGA_VOICES; ++i)
         {
             sc = &scope[i];
 
-            // clear background
-            ptr32Src = trackerFrameBMP + ((71 * SCREEN_W) + 128);
-            ptr32Dst = pixelBuffer     + ((55 * SCREEN_W) + (128 + (i * (SCOPE_WIDTH + 8))));
-            y = 33;
+            // clear scope background
 
-            while (y--)
+            dstPtr     = &pixelBuffer[(55 * SCREEN_W) + (128 + (i * (SCOPE_WIDTH + 8)))];
+            scopePixel = palette[PAL_BACKGRD];
+
+            for (y = 0; y < 33; ++y)
             {
-                memcpy(ptr32Dst, ptr32Src, SCOPE_WIDTH * sizeof (int32_t));
-                ptr32Dst += SCREEN_W;
+                for (x = 0; x < SCOPE_WIDTH; ++x)
+                    dstPtr[x] = scopePixel;
+
+                dstPtr += SCREEN_W;
             }
 
-            // render scopes
+            // render scope
 
-            readPtr = sc->data;
-            dataLen = sc->length;
+            scopePixel = palette[PAL_QADSCP];
+            readPtr    = sc->data;
+            dataLen    = sc->length;
 
             if (!sc->active || editor.muted[i] || (readPtr == NULL) || (dataLen <= 0))
             {
@@ -140,7 +140,7 @@ void drawScopes(void)
             else
             {
                 readPos = sc->phase;
-                volume  = sc->volume;
+                volume = sc->volume;
 
                 if (sc->loopFlag)
                 {
@@ -157,7 +157,7 @@ void drawScopes(void)
                         else if (readPos >= dataLen)
                         {
                             // readPtr = sampleStartPtr, wrap readPos to loop start
-                            readPos  = loopStart;
+                            readPos = loopStart;
                         }
 
                         scopeData = readPtr[readPos++] * volume;
@@ -189,20 +189,24 @@ void drawScopes(void)
     else
     {
         // -- monoscope --
-        scopePtr = pixelBuffer + ((76 * SCREEN_W) + 120);
 
-        // clear background
-        ptr32Src = monoScopeBMP + (11 * (MONOSCOPE_WIDTH + 3));
-        ptr32Dst = pixelBuffer  + (55 * SCREEN_W) + 120;
+        // clear scope background
 
-        y = 44;
-        while (y--)
+        dstPtr     = &pixelBuffer[(55 * SCREEN_W) + 120];
+        scopePixel = palette[PAL_BACKGRD];
+
+        for (y = 0; y < 44; ++y)
         {
-            memcpy(ptr32Dst, ptr32Src, MONOSCOPE_WIDTH * sizeof (int32_t));
-            ptr32Dst += SCREEN_W;
+            for (x = 0; x < MONOSCOPE_WIDTH; ++x)
+                dstPtr[x] = scopePixel;
+
+            dstPtr += SCREEN_W;
         }
 
         // mix channels
+
+        dstPtr     = &pixelBuffer[(76 * SCREEN_W) + 120];
+        scopePixel = palette[PAL_QADSCP];
 
         memset(monoScopeBuffer, 0, sizeof (monoScopeBuffer));
 
@@ -263,7 +267,7 @@ void drawScopes(void)
                 scopeTemp  = CLAMP(scopeTemp, -21, 22);
             }
 
-            scopePtr[(scopeTemp * SCREEN_W) + x] = scopePixel;
+            dstPtr[(scopeTemp * SCREEN_W) + x] = scopePixel;
         }
     }
 }

@@ -141,49 +141,51 @@ static void setDragBar(void)
 {
     uint8_t y;
     uint16_t x;
-    int32_t barLen;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst, pixel;
-
-    // clear drag bar background
-    ptr32Src = samplerScreenBMP + ((85 * 320) + 4);
-    memcpy(&pixelBuffer[(206 * SCREEN_W) + 4], ptr32Src, 312 * sizeof (int32_t));
-    memcpy(&pixelBuffer[(207 * SCREEN_W) + 4], ptr32Src, 312 * sizeof (int32_t));
-    memcpy(&pixelBuffer[(208 * SCREEN_W) + 4], ptr32Src, 312 * sizeof (int32_t));
-    memcpy(&pixelBuffer[(209 * SCREEN_W) + 4], ptr32Src, 312 * sizeof (int32_t));
+    uint32_t *dstPtr, pixel, bgPixel;
 
     if ((editor.sampler.samLength > 0) && (editor.sampler.samDisplay != editor.sampler.samLength))
     {
         // update drag bar coordinates
         editor.sampler.dragStart = 4 + (uint16_t)(((editor.sampler.samOffset * 311) / (float)(editor.sampler.samLength)) + 0.5f);
         editor.sampler.dragEnd   = 5 + (uint16_t)((((editor.sampler.samDisplay + editor.sampler.samOffset) * 311) / (float)(editor.sampler.samLength)) + 0.5f);
-
-        if (editor.sampler.dragStart < 4)
-            editor.sampler.dragStart = 4;
-        else if (editor.sampler.dragStart > 315)
-            editor.sampler.dragStart = 315;
-
-        if (editor.sampler.dragEnd < 5)
-            editor.sampler.dragEnd = 5;
-        else if (editor.sampler.dragEnd > 316)
-            editor.sampler.dragEnd = 316;
+        editor.sampler.dragStart = CLAMP(editor.sampler.dragStart, 4, 315);
+        editor.sampler.dragEnd   = CLAMP(editor.sampler.dragEnd,   5, 316);
 
         if (editor.sampler.dragStart > (editor.sampler.dragEnd - 1))
             editor.sampler.dragStart =  editor.sampler.dragEnd - 1;
 
         // draw drag bar
-        ptr32Dst = pixelBuffer + ((206 * SCREEN_W) + editor.sampler.dragStart);
-        pixel    = palette[PAL_QADSCP];
-        barLen   = CLAMP(editor.sampler.dragEnd - editor.sampler.dragStart, 1, 312);
 
-        y = 4;
-        while (y--)
+        dstPtr  = &pixelBuffer[206 * SCREEN_W];
+        pixel   = palette[PAL_QADSCP];
+        bgPixel = palette[PAL_BACKGRD];
+
+        for (y = 0; y < 4; ++y)
         {
-            x = barLen;
-            while (x--)
-                *ptr32Dst++ = pixel;
+            for (x = 4; x < 316; ++x)
+            {
+                if ((x >= editor.sampler.dragStart) && (x <= editor.sampler.dragEnd))
+                    dstPtr[x] = pixel;   /* drag bar */
+                else
+                    dstPtr[x] = bgPixel; /* background */
+            }
 
-            ptr32Dst += (SCREEN_W - barLen);
+            dstPtr += SCREEN_W;
+        }
+    }
+    else
+    {
+        // clear drag bar background
+
+        dstPtr = &pixelBuffer[(206 * SCREEN_W) + 4];
+        pixel  = palette[PAL_BACKGRD];
+
+        for (y = 0; y < 4; ++y)
+        {
+            for (x = 0; x < 312; ++x)
+                dstPtr[x] = pixel;
+
+            dstPtr += SCREEN_W;
         }
     }
 }
@@ -210,15 +212,16 @@ int32_t smpPos2Scr(int32_t pos) // sample pos -> screen x pos
 {
     int32_t scaledPos;
 
-    pos = (pos * SAMPLE_AREA_WIDTH) / editor.sampler.samDisplay;
-
     if (editor.sampler.samDisplay > 0)
     {
+        pos = (pos * SAMPLE_AREA_WIDTH) / editor.sampler.samDisplay;
         scaledPos = (editor.sampler.samOffset * SAMPLE_AREA_WIDTH) / editor.sampler.samDisplay;
         pos -= scaledPos;
+
+        return (pos);
     }
 
-    return (pos);
+    return (0);
 }
 
 int32_t scr2SmpPos(int32_t x) // screen x pos -> sample pos
@@ -261,27 +264,27 @@ static void renderSampleData(void)
 {
     int8_t *smpPtr;
     int16_t y1, y2, y, x, min, max, oldMin, oldMax, numSmpsPerPixel;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    uint32_t *dstPtr, pixel;
     moduleSample_t *s;
 
     s = &modEntry->samples[editor.currSample];
 
-    // clear sample data
-    ptr32Src = samplerScreenBMP + (17 * 320);
-    ptr32Dst = pixelBuffer + (138 * SCREEN_W);
-    y = SAMPLE_VIEW_HEIGHT;
-    while (y--)
-    {
-        memcpy(ptr32Dst, ptr32Src, 320 * sizeof (int32_t));
+    // clear sample data background
 
-        ptr32Src += 320;
-        ptr32Dst += SCREEN_W;
+    dstPtr = &pixelBuffer[(138 * SCREEN_W) + 3];
+    pixel  = palette[PAL_BACKGRD];
+
+    for (y = 0; y < SAMPLE_VIEW_HEIGHT; ++y)
+    {
+        for (x = 0; x < SAMPLE_AREA_WIDTH; ++x)
+            dstPtr[x] = pixel;
+
+        dstPtr += SCREEN_W;
     }
 
     // display center line
     if (editor.ui.dottedCenterFlag)
-        memset(pixelBuffer + ((SAMPLE_AREA_Y_CENTER * SCREEN_W) + 3), 0x00373737, SAMPLE_AREA_WIDTH * sizeof (int32_t));
+        memset(&pixelBuffer[(SAMPLE_AREA_Y_CENTER * SCREEN_W) + 3], 0x373737, SAMPLE_AREA_WIDTH * sizeof (int32_t));
 
     // render sample data
     if ((editor.sampler.samDisplay >= 0) && (editor.sampler.samDisplay <= MAX_SAMPLE_LEN))
@@ -340,8 +343,8 @@ void invertRange(void)
 {
     uint8_t y;
     int16_t x;
-    int32_t rangeLen, pitch, start, end;
-    uint32_t *ptr32Dst, pixel1, pixel2;
+    int32_t rangeLen, dstPitch, start, end;
+    uint32_t *dstPtr, pixel1, pixel2;
 
     if ((editor.markStartOfs == 0) && (editor.markEndOfs == 0))
         return; // very first sample is the "no range" special case
@@ -359,28 +362,24 @@ void invertRange(void)
     if (rangeLen < 1)
         rangeLen = 1;
 
-    pitch = SCREEN_W - rangeLen;
+    dstPtr   = &pixelBuffer[(138 * SCREEN_W) + (3 + start)];
+    dstPitch = SCREEN_W - rangeLen;
+    pixel1   = palette[PAL_BACKGRD];
+    pixel2   = palette[PAL_QADSCP];
 
-    pixel1 = palette[PAL_BACKGRD];
-    pixel2 = palette[PAL_QADSCP];
-
-    ptr32Dst = pixelBuffer + ((138 * SCREEN_W) + 3 + start);
-
-    y = 64;
-    while (y--)
+    for (y = 0; y < 64; ++y)
     {
-        x = rangeLen;
-        while (x--)
+        for (x = 0; x < rangeLen; ++x)
         {
-                 if (*ptr32Dst ==     pixel1) *ptr32Dst = 0x00666666;
-            else if (*ptr32Dst == 0x00666666) *ptr32Dst = pixel1;
-            else if (*ptr32Dst == 0x00CCCCCC) *ptr32Dst = pixel2;
-            else if (*ptr32Dst ==     pixel2) *ptr32Dst = 0x00CCCCCC;
+                 if (*dstPtr ==   pixel1) *dstPtr = 0x666666;
+            else if (*dstPtr == 0x666666) *dstPtr = pixel1;
+            else if (*dstPtr == 0xCCCCCC) *dstPtr = pixel2;
+            else if (*dstPtr ==   pixel2) *dstPtr = 0xCCCCCC;
 
-            ptr32Dst++;
+            dstPtr++;
         }
 
-        ptr32Dst += pitch;
+        dstPtr += dstPitch;
     }
 }
 

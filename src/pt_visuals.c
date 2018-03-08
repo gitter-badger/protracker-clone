@@ -84,56 +84,47 @@ void removeAskDialog(void)
 
 void renderAskDialog(void)
 {
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
     int32_t y;
 
     editor.ui.disablePosEd      = true;
     editor.ui.disableVisualizer = true;
 
     // render ask dialog
-    ptr32Src = editor.ui.pat2SmpDialogShown ? pat2SmpDialogBMP : yesNoDialogBMP;
-    ptr32Dst = pixelBuffer + ((51 * SCREEN_W) + 160);
 
-    y = 39;
-    while (y--)
+    srcPtr = editor.ui.pat2SmpDialogShown ? pat2SmpDialogBMP : yesNoDialogBMP;
+    dstPtr = &pixelBuffer[(51 * SCREEN_W) + 160];
+
+    for (y = 0; y < 39; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 104 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 104 * sizeof (int32_t));
 
-        ptr32Src += 104;
-        ptr32Dst += SCREEN_W;
+        srcPtr += 104;
+        dstPtr += SCREEN_W;
     }
 }
 
 void fillFromVuMetersBgBuffer(void)
 {
-    uint8_t i, y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    uint8_t i, y, x;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
     if (!editor.ui.samplerScreenShown && !editor.ui.terminalShown)
     {
         for (i = 0; i < AMIGA_VOICES; ++i)
         {
-            ptr32Src = vuMetersBg + (i * (10 * 48));
-            ptr32Dst = pixelBuffer + ((187 * SCREEN_W) + (55 + (i * 72)));
+            srcPtr = &vuMetersBg[i * (10 * 48)];
+            dstPtr = &pixelBuffer[(187 * SCREEN_W) + (55 + (i * 72))];
 
-            y = 48;
-            while (y--)
+            for (y = 0; y < 48; ++y)
             {
-                *(ptr32Dst + 0) = *(ptr32Src + 0);
-                *(ptr32Dst + 1) = *(ptr32Src + 1);
-                *(ptr32Dst + 2) = *(ptr32Src + 2);
-                *(ptr32Dst + 3) = *(ptr32Src + 3);
-                *(ptr32Dst + 4) = *(ptr32Src + 4);
-                *(ptr32Dst + 5) = *(ptr32Src + 5);
-                *(ptr32Dst + 6) = *(ptr32Src + 6);
-                *(ptr32Dst + 7) = *(ptr32Src + 7);
-                *(ptr32Dst + 8) = *(ptr32Src + 8);
-                *(ptr32Dst + 9) = *(ptr32Src + 9);
+                for (x = 0; x < 10; ++x)
+                    dstPtr[x] = srcPtr[x];
 
-                ptr32Src += 10;
-                ptr32Dst -= SCREEN_W;
+                srcPtr += 10;
+                dstPtr -= SCREEN_W;
             }
         }
     }
@@ -141,33 +132,24 @@ void fillFromVuMetersBgBuffer(void)
 
 void fillToVuMetersBgBuffer(void)
 {
-    uint8_t i, y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    uint8_t i, y, x;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
     if (!editor.ui.samplerScreenShown && !editor.ui.terminalShown)
     {
         for (i = 0; i < AMIGA_VOICES; ++i)
         {
-            ptr32Src = pixelBuffer + ((187 * SCREEN_W) + (55 + (i * 72)));
-            ptr32Dst = vuMetersBg + (i * (10 * 48));
+            srcPtr = &pixelBuffer[(187 * SCREEN_W) + (55 + (i * 72))];
+            dstPtr = &vuMetersBg[i * (10 * 48)];
 
-            y = 48;
-            while (y--)
+            for (y = 0; y < 48; ++y)
             {
-                *(ptr32Dst + 0) = *(ptr32Src + 0);
-                *(ptr32Dst + 1) = *(ptr32Src + 1);
-                *(ptr32Dst + 2) = *(ptr32Src + 2);
-                *(ptr32Dst + 3) = *(ptr32Src + 3);
-                *(ptr32Dst + 4) = *(ptr32Src + 4);
-                *(ptr32Dst + 5) = *(ptr32Src + 5);
-                *(ptr32Dst + 6) = *(ptr32Src + 6);
-                *(ptr32Dst + 7) = *(ptr32Src + 7);
-                *(ptr32Dst + 8) = *(ptr32Src + 8);
-                *(ptr32Dst + 9) = *(ptr32Src + 9);
+                for (x = 0; x < 10; ++x)
+                    dstPtr[x] = srcPtr[x];
 
-                ptr32Src -= SCREEN_W;
-                ptr32Dst += 10;
+                srcPtr -= SCREEN_W;
+                dstPtr += 10;
             }
         }
     }
@@ -175,9 +157,9 @@ void fillToVuMetersBgBuffer(void)
 
 void renderVuMeters(void)
 {
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
-    uint8_t i, y;
+    const uint32_t *srcPtr;
+    int32_t i, h, y, x;
+    uint32_t *dstPtr;
 
     fillToVuMetersBgBuffer();
 
@@ -185,34 +167,25 @@ void renderVuMeters(void)
     {
         for (i = 0; i < AMIGA_VOICES; ++i)
         {
-            ptr32Src = vuMeterBMP;
-            ptr32Dst = pixelBuffer + ((187 * SCREEN_W) + (55 + (i * 72)));
+            srcPtr = vuMeterBMP;
+            dstPtr = &pixelBuffer[(187 * SCREEN_W) + (55 + (i * 72))];
 
             if (editor.ui.realVuMeters)
-            {
-                y = (uint8_t)(editor.realVuMeterVolumes[i] + 0.5f);
-                if (y > 48) y = 48;
-            }
+                h = (int32_t)(editor.realVuMeterVolumes[i]); // truncate
+
             else
-            {
-                y = editor.vuMeterVolumes[i];
-            }
+                h = editor.vuMeterVolumes[i];
 
-            while (y--)
-            {
-                *(ptr32Dst + 0) = *(ptr32Src + 0);
-                *(ptr32Dst + 1) = *(ptr32Src + 1);
-                *(ptr32Dst + 2) = *(ptr32Src + 2);
-                *(ptr32Dst + 3) = *(ptr32Src + 3);
-                *(ptr32Dst + 4) = *(ptr32Src + 4);
-                *(ptr32Dst + 5) = *(ptr32Src + 5);
-                *(ptr32Dst + 6) = *(ptr32Src + 6);
-                *(ptr32Dst + 7) = *(ptr32Src + 7);
-                *(ptr32Dst + 8) = *(ptr32Src + 8);
-                *(ptr32Dst + 9) = *(ptr32Src + 9);
+            if (h > 48)
+                h = 48;
 
-                ptr32Src += 10;
-                ptr32Dst -= SCREEN_W;
+            for (y = 0; y < h; ++y)
+            {
+                for (x = 0; x < 10; ++x)
+                    dstPtr[x] = srcPtr[x];
+
+                srcPtr += 10;
+                dstPtr -= SCREEN_W;
             }
         }
     }
@@ -510,7 +483,7 @@ void updateSampler(void)
                 editor.ui.update9xxPos = false;
 
                 textOutBg(pixelBuffer, 288, 247, "---", palette[PAL_GENTXT], palette[PAL_GENBKG]);
-                if ((s->length <= 0x0000FFFE) && (editor.ui.lastSampleOffset > 0x0900) && (editor.ui.lastSampleOffset <= 0x09FF))
+                if ((s->length <= 0x00FFFE) && (editor.ui.lastSampleOffset > 0x0900) && (editor.ui.lastSampleOffset <= 0x09FF))
                     printThreeHexBg(pixelBuffer, 288, 247, editor.ui.lastSampleOffset, palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
         }
@@ -579,74 +552,67 @@ void updateSampler(void)
 
 void showVolFromSlider(void)
 {
-    uint8_t x;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst, pixel;
+    uint32_t *dstPtr, x, y, pixel, bgPixel, sliderStart, sliderEnd;
 
-    // clear background
-    ptr32Src = samplerVolumeBMP + ((4 * 136) + 33);
-    ptr32Dst = pixelBuffer + ((158 * SCREEN_W) + 105);
-    memcpy(ptr32Dst, ptr32Src, 65 * sizeof (int32_t));
-    memcpy(ptr32Dst + (1 * SCREEN_W), ptr32Src, 65 * sizeof (int32_t));
-    memcpy(ptr32Dst + (2 * SCREEN_W), ptr32Src, 65 * sizeof (int32_t));
+    sliderStart = (editor.vol1 * 3) / 10;
+    sliderEnd   = sliderStart + 4;
+    pixel       = palette[PAL_QADSCP];
+    bgPixel     = palette[PAL_BACKGRD];
+    dstPtr      = &pixelBuffer[(158 * SCREEN_W) + 105];
 
-    // render slider
-    ptr32Dst = pixelBuffer + ((158 * SCREEN_W) + (105 + ((editor.vol1 * 3) / 10)));
-    pixel = palette[PAL_QADSCP];
-    x = 5;
-    while (x--)
+    for (y = 0; y < 3; ++y)
     {
-        *ptr32Dst = pixel;
-        *(ptr32Dst + (1 * SCREEN_W)) = pixel;
-        *(ptr32Dst + (2 * SCREEN_W)) = pixel;
+        for (x = 0; x < 65; ++x)
+        {
+            if ((x >= sliderStart) && (x <= sliderEnd))
+                dstPtr[x] = pixel;
+            else
+                dstPtr[x] = bgPixel;
+        }
 
-        ptr32Dst++;
+        dstPtr += SCREEN_W;
     }
 }
 
 void showVolToSlider(void)
 {
-    uint8_t x;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst, pixel;
+    uint32_t *dstPtr, x, y, pixel, bgPixel, sliderStart, sliderEnd;
 
-    // clear background
-    ptr32Src = samplerVolumeBMP + ((4 * 136) + 33);
-    ptr32Dst = pixelBuffer + ((169 * SCREEN_W) + 105);
-    memcpy(ptr32Dst, ptr32Src, 65 * sizeof (int32_t));
-    memcpy(ptr32Dst + (1 * SCREEN_W), ptr32Src, 65 * sizeof (int32_t));
-    memcpy(ptr32Dst + (2 * SCREEN_W), ptr32Src, 65 * sizeof (int32_t));
+    sliderStart = (editor.vol2 * 3) / 10;
+    sliderEnd   = sliderStart + 4;
+    pixel       = palette[PAL_QADSCP];
+    bgPixel     = palette[PAL_BACKGRD];
+    dstPtr      = &pixelBuffer[(169 * SCREEN_W) + 105];
 
-    // render slider
-    ptr32Dst = pixelBuffer + ((169 * SCREEN_W) + (105 + ((editor.vol2 * 3) / 10)));
-    pixel = palette[PAL_QADSCP];
-    x = 5;
-    while (x--)
+    for (y = 0; y < 3; ++y)
     {
-        *ptr32Dst = pixel;
-        *(ptr32Dst + (1 * SCREEN_W)) = pixel;
-        *(ptr32Dst + (2 * SCREEN_W)) = pixel;
+        for (x = 0; x < 65; ++x)
+        {
+            if ((x >= sliderStart) && (x <= sliderEnd))
+                dstPtr[x] = pixel;
+            else
+                dstPtr[x] = bgPixel;
+        }
 
-        ptr32Dst++;
+        dstPtr += SCREEN_W;
     }
 }
 
 void renderSamplerVolBox(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
-    ptr32Src = samplerVolumeBMP;
-    ptr32Dst = pixelBuffer + ((154 * SCREEN_W) + 72);
+    srcPtr = samplerVolumeBMP;
+    dstPtr = &pixelBuffer[(154 * SCREEN_W) + 72];
 
-    y = 33;
-    while (y--)
+    for (y = 0; y < 33; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 136 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 136 * sizeof (int32_t));
 
-        ptr32Src += 136;
-        ptr32Dst += SCREEN_W;
+        srcPtr += 136;
+        dstPtr += SCREEN_W;
     }
 
     editor.ui.updateVolFromText = true;
@@ -667,26 +633,25 @@ void removeSamplerVolBox(void)
 void renderSamplerFiltersBox(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
-    ptr32Src = samplerFiltersBMP;
-    ptr32Dst = pixelBuffer + ((154 * SCREEN_W) + 65);
+    srcPtr = samplerFiltersBMP;
+    dstPtr = &pixelBuffer[(154 * SCREEN_W) + 65];
 
-    y = 33;
-    while (y--)
+    for (y = 0; y < 33; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 186 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 186 * sizeof (int32_t));
 
-        ptr32Src += 186;
-        ptr32Dst += SCREEN_W;
+        srcPtr += 186;
+        dstPtr += SCREEN_W;
     }
 
     textOut(pixelBuffer, 200, 157, "HZ", palette[PAL_GENTXT]);
     textOut(pixelBuffer, 200, 168, "HZ", palette[PAL_GENTXT]);
 
-    editor.ui.updateLPText = true;
-    editor.ui.updateHPText = true;
+    editor.ui.updateLPText   = true;
+    editor.ui.updateHPText   = true;
     editor.ui.updateNormFlag = true;
 
     // hide loop sprites
@@ -713,9 +678,9 @@ void renderDiskOpScreen(void)
 void updateDiskOp(void)
 {
     char tmpChar;
-    uint8_t i, y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    uint8_t i, x, y;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
     if (editor.ui.diskOpScreenShown && !editor.ui.posEdScreenShown)
     {
@@ -733,21 +698,18 @@ void updateDiskOp(void)
             charOutBg(pixelBuffer, 147,  3, ' ', palette[PAL_GENBKG], palette[PAL_GENBKG]);
             charOutBg(pixelBuffer, 147, 14, ' ', palette[PAL_GENBKG], palette[PAL_GENBKG]);
 
-            ptr32Src = arrowBMP;
-            ptr32Dst = pixelBuffer + ((((11 * editor.diskop.mode) + 3) * SCREEN_W) + 148);
+            // draw load mode arrow
 
-            y = 5;
-            while (y--)
+            srcPtr = arrowBMP;
+            dstPtr = &pixelBuffer[(((11 * editor.diskop.mode) + 3) * SCREEN_W) + 148];
+
+            for (y = 0; y < 5; ++y)
             {
-                *(ptr32Dst + 0) = *(ptr32Src + 0);
-                *(ptr32Dst + 1) = *(ptr32Src + 1);
-                *(ptr32Dst + 2) = *(ptr32Src + 2);
-                *(ptr32Dst + 3) = *(ptr32Src + 3);
-                *(ptr32Dst + 4) = *(ptr32Src + 4);
-                *(ptr32Dst + 5) = *(ptr32Src + 5);
+                for (x = 0; x < 6; ++x)
+                    dstPtr[x] = srcPtr[x];
 
-                ptr32Src += 6;
-                ptr32Dst += SCREEN_W;
+                srcPtr += 6;
+                dstPtr += SCREEN_W;
             }
         }
 
@@ -777,8 +739,7 @@ void updateDiskOp(void)
                 if (((tmpChar < ' ') || (tmpChar > '~')) && (tmpChar != '\0'))
                     tmpChar = ' '; // was illegal character
 
-                charOutBg(pixelBuffer, 24 + (i * FONT_CHAR_W), 25, (tmpChar == '\0') ? '_' : tmpChar,
-                    palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                charOutBg(pixelBuffer, 24 + (i * FONT_CHAR_W), 25, (tmpChar == '\0') ? '_' : tmpChar, palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
         }
     }
@@ -787,8 +748,9 @@ void updateDiskOp(void)
 void updatePosEd(void)
 {
     char posEdChar;
-    uint8_t x, y, i;
+    uint8_t x, y, y2, i;
     int16_t posEdPosition;
+    uint32_t *dstPtr, bgPixel;
 
     if (editor.ui.posEdScreenShown)
     {
@@ -798,6 +760,8 @@ void updatePosEd(void)
 
             if (!editor.ui.disablePosEd)
             {
+                bgPixel = palette[PAL_BACKGRD];
+
                 posEdPosition = modEntry->currOrder;
                 if (posEdPosition > (modEntry->head.orderCount - 1))
                     posEdPosition =  modEntry->head.orderCount - 1;
@@ -809,6 +773,7 @@ void updatePosEd(void)
                     {
                         printThreeDecimalsBg(pixelBuffer, 128, 23 + (y * 6), posEdPosition - (5 - y), palette[PAL_QADSCP], palette[PAL_BACKGRD]);
                         printTwoDecimalsBg(pixelBuffer,   160, 23 + (y * 6), modEntry->head.order[posEdPosition - (5 - y)], palette[PAL_QADSCP], palette[PAL_BACKGRD]);
+
                         for (i = 0; i < 15; ++i)
                         {
                             posEdChar = editor.ui.pattNames[((modEntry->head.order[posEdPosition - (5 - y)] * 16) + editor.textofs.posEdPattName) + i];
@@ -820,14 +785,13 @@ void updatePosEd(void)
                     }
                     else
                     {
-                        x = FONT_CHAR_W * 22;
-                        while (x--)
+                        dstPtr = &pixelBuffer[((23 + (y * 6)) * SCREEN_W) + 128];
+                        for (y2 = 0; y2 < 5; ++y2)
                         {
-                            pixelBuffer[((23 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
-                            pixelBuffer[((24 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
-                            pixelBuffer[((25 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
-                            pixelBuffer[((26 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
-                            pixelBuffer[((27 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
+                            for (x = 0; x < (FONT_CHAR_W * 22); ++x)
+                                dstPtr[x] = bgPixel;
+
+                            dstPtr += SCREEN_W;
                         }
                     }
                 }
@@ -862,14 +826,13 @@ void updatePosEd(void)
                     }
                     else
                     {
-                        x = FONT_CHAR_W * 22;
-                        while (x--)
+                        dstPtr = &pixelBuffer[((59 + (y * 6)) * SCREEN_W) + 128];
+                        for (y2 = 0; y2 < 5; ++y2)
                         {
-                            pixelBuffer[((59 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
-                            pixelBuffer[((60 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
-                            pixelBuffer[((61 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
-                            pixelBuffer[((62 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
-                            pixelBuffer[((63 + (y * 6)) * SCREEN_W) + (128 + x)] = palette[PAL_BACKGRD];
+                            for (x = 0; x < (FONT_CHAR_W * 22); ++x)
+                                dstPtr[x] = bgPixel;
+
+                            dstPtr += SCREEN_W;
                         }
                     }
                 }
@@ -881,12 +844,16 @@ void updatePosEd(void)
                         renderTextEditMarker();
                 }
 
-                // hack to fix broken pixels after editing text...
-                pixelBuffer[(53 * SCREEN_W) + 303] = palette[PAL_GENBKG2];
-                pixelBuffer[(54 * SCREEN_W) + 303] = palette[PAL_GENBKG2];
-                pixelBuffer[(55 * SCREEN_W) + 303] = palette[PAL_GENBKG2];
-                pixelBuffer[(56 * SCREEN_W) + 303] = palette[PAL_GENBKG2];
-                pixelBuffer[(57 * SCREEN_W) + 303] = palette[PAL_GENBKG2];
+                 // hack to fix broken pixels after editing text...
+
+                bgPixel = palette[PAL_GENBKG2];
+                dstPtr  = &pixelBuffer[(53 * SCREEN_W) + 303];
+
+                for (y = 0; y < 5; ++y)
+                {
+                    *dstPtr  = bgPixel;
+                     dstPtr += SCREEN_W;
+                }
             }
         }
     }
@@ -895,27 +862,26 @@ void updatePosEd(void)
 void renderPosEdScreen(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
-    ptr32Src = posEdBMP;
-    ptr32Dst = pixelBuffer + 120;
+    srcPtr = posEdBMP;
+    dstPtr = &pixelBuffer[120];
 
-    y = 99;
-    while (y--)
+    for (y = 0; y < 99; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 200 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 200 * sizeof (int32_t));
 
-        ptr32Src += 200;
-        ptr32Dst += SCREEN_W;
+        srcPtr += 200;
+        dstPtr += SCREEN_W;
     }
 }
 
 void renderMuteButtons(void)
 {
-    uint8_t i, y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst, lineW;
+    uint8_t i, x, y;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr, srcPitch;
 
     if (!editor.ui.diskOpScreenShown && !editor.ui.posEdScreenShown)
     {
@@ -923,31 +889,23 @@ void renderMuteButtons(void)
         {
             if (editor.muted[i])
             {
-                ptr32Src = muteButtonsBMP + (i * (6 * 7));
-                lineW = 7;
+                srcPtr   = &muteButtonsBMP[i * (6 * 7)];
+                srcPitch = 7;
             }
             else
             {
-                ptr32Src = trackerFrameBMP + ((3 + (i * 11)) * SCREEN_W) + 310;
-                lineW = SCREEN_W;
+                srcPtr   = &trackerFrameBMP[((3 + (i * 11)) * SCREEN_W) + 310];
+                srcPitch = SCREEN_W;
             }
 
-            ptr32Dst = pixelBuffer + ((3 + (i * 11)) * SCREEN_W) + 310;
-
-            y = 6;
-            while (y--)
+            dstPtr = &pixelBuffer[((3 + (i * 11)) * SCREEN_W) + 310];
+            for (y = 0; y < 6; ++y)
             {
-                *(ptr32Dst + 0) = *(ptr32Src + 0);
-                *(ptr32Dst + 1) = *(ptr32Src + 1);
-                *(ptr32Dst + 2) = *(ptr32Src + 2);
-                *(ptr32Dst + 3) = *(ptr32Src + 3);
-                *(ptr32Dst + 4) = *(ptr32Src + 4);
-                *(ptr32Dst + 5) = *(ptr32Src + 5);
-                *(ptr32Dst + 6) = *(ptr32Src + 6);
+                for (x = 0; x < 7; ++x)
+                    dstPtr[x] = srcPtr[x];
 
-
-                ptr32Src += lineW;
-                ptr32Dst += SCREEN_W;
+                srcPtr += srcPitch;
+                dstPtr += SCREEN_W;
             }
         }
     }
@@ -956,22 +914,21 @@ void renderMuteButtons(void)
 void renderClearScreen(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
     editor.ui.disablePosEd      = true;
     editor.ui.disableVisualizer = true;
 
-    ptr32Src = clearDialogBMP;
-    ptr32Dst = pixelBuffer + ((51 * SCREEN_W) + 160);
+    srcPtr = clearDialogBMP;
+    dstPtr = &pixelBuffer[(51 * SCREEN_W) + 160];
 
-    y = 39;
-    while (y--)
+    for (y = 0; y < 39; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 104 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 104 * sizeof (int32_t));
 
-        ptr32Src += 104;
-        ptr32Dst += SCREEN_W;
+        srcPtr += 104;
+        dstPtr += SCREEN_W;
     }
 }
 
@@ -1021,80 +978,60 @@ void updatePatternData(void)
 
 void removeTextEditMarker(void)
 {
-    uint32_t *ptr32Dst, *ptr32Dst_2, pixel;
+    uint32_t *dstPtr, x, y, pixel;
 
     if (editor.ui.editTextFlag)
     {
-        ptr32Dst   = pixelBuffer + ((editor.ui.lineCurY * SCREEN_W) + (editor.ui.lineCurX - 4));
-        ptr32Dst_2 = ptr32Dst - SCREEN_W;
+        dstPtr = &pixelBuffer[((editor.ui.lineCurY - 1) * SCREEN_W) + (editor.ui.lineCurX - 4)];
 
         if ((editor.ui.editObject == PTB_PE_PATT) || (editor.ui.editObject == PTB_PE_PATTNAME))
         {
-            pixel = palette[PAL_BACKGRD];
-            *(ptr32Dst + 0) = pixel;
-            *(ptr32Dst + 1) = pixel;
-            *(ptr32Dst + 2) = pixel;
-            *(ptr32Dst + 3) = pixel;
-            *(ptr32Dst + 4) = pixel;
-            *(ptr32Dst + 5) = pixel;
-            *(ptr32Dst + 6) = pixel;
+            /* position editor text editing */
 
             pixel = palette[PAL_GENBKG2];
-            *(ptr32Dst_2 + 0) = pixel;
-            *(ptr32Dst_2 + 1) = pixel;
-            *(ptr32Dst_2 + 2) = pixel;
-            *(ptr32Dst_2 + 3) = pixel;
-            *(ptr32Dst_2 + 4) = pixel;
-            *(ptr32Dst_2 + 5) = pixel;
-            *(ptr32Dst_2 + 6) = pixel;
+            for (y = 0; y < 2; ++y)
+            {
+                for (x = 0; x < 7; ++x)
+                    dstPtr[x] = pixel;
+
+                dstPtr += SCREEN_W;
+                pixel   = palette[PAL_BACKGRD];
+            }
 
             editor.ui.updatePosEd = true;
         }
         else
         {
+            /* all others */
+
             pixel = palette[PAL_GENBKG];
-            *(ptr32Dst   + 0) = pixel;
-            *(ptr32Dst   + 1) = pixel;
-            *(ptr32Dst   + 2) = pixel;
-            *(ptr32Dst   + 3) = pixel;
-            *(ptr32Dst   + 4) = pixel;
-            *(ptr32Dst   + 5) = pixel;
-            *(ptr32Dst   + 6) = pixel;
-            *(ptr32Dst_2 + 0) = pixel;
-            *(ptr32Dst_2 + 1) = pixel;
-            *(ptr32Dst_2 + 2) = pixel;
-            *(ptr32Dst_2 + 3) = pixel;
-            *(ptr32Dst_2 + 4) = pixel;
-            *(ptr32Dst_2 + 5) = pixel;
-            *(ptr32Dst_2 + 6) = pixel;
+            for (y = 0; y < 2; ++y)
+            {
+                for (x = 0; x < 7; ++x)
+                    dstPtr[x] = pixel;
+
+                dstPtr += SCREEN_W;
+            }
         }
     }
 }
 
 void renderTextEditMarker(void)
 {
-    uint32_t *ptr32Dst, *ptr32Dst_2, pixel;
+    uint32_t *dstPtr, pixel, x, y;
 
     if (editor.ui.editTextFlag)
     {
-        ptr32Dst   = pixelBuffer + ((editor.ui.lineCurY * SCREEN_W) + (editor.ui.lineCurX - 4));
-        ptr32Dst_2 = ptr32Dst - SCREEN_W;
-        pixel      = palette[PAL_TEXTMARK];
+        dstPtr = &pixelBuffer[((editor.ui.lineCurY - 1) * SCREEN_W) + (editor.ui.lineCurX - 4)];
+        pixel  = palette[PAL_TEXTMARK];
 
-        *(ptr32Dst   + 0) = pixel;
-        *(ptr32Dst   + 1) = pixel;
-        *(ptr32Dst   + 2) = pixel;
-        *(ptr32Dst   + 3) = pixel;
-        *(ptr32Dst   + 4) = pixel;
-        *(ptr32Dst   + 5) = pixel;
-        *(ptr32Dst   + 6) = pixel;
-        *(ptr32Dst_2 + 0) = pixel;
-        *(ptr32Dst_2 + 1) = pixel;
-        *(ptr32Dst_2 + 2) = pixel;
-        *(ptr32Dst_2 + 3) = pixel;
-        *(ptr32Dst_2 + 4) = pixel;
-        *(ptr32Dst_2 + 5) = pixel;
-        *(ptr32Dst_2 + 6) = pixel;
+        for (y = 0; y < 2; ++y)
+        {
+            for (x = 0; x < 7; ++x)
+                dstPtr[x] = pixel;
+
+            dstPtr += SCREEN_W;
+        }
     }
 }
 
@@ -1109,41 +1046,38 @@ void updateDragBars(void)
 
 void updateVisualizer(void)
 {
-    uint8_t i, y;
-    int32_t tmpVol;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst, pixel;
+    int32_t i, x, y, tmpVol;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr, pixel;
+
+    if (editor.ui.disableVisualizer)
+        return;
 
     if (!editor.ui.diskOpScreenShown && !editor.ui.posEdScreenShown &&
         !editor.ui.editOpScreenShown && !editor.ui.aboutScreenShown &&
-        !editor.ui.disableVisualizer && !editor.ui.askScreenShown   &&
-        !editor.isWAVRendering       && !editor.ui.terminalShown)
+        !editor.ui.askScreenShown    && !editor.isWAVRendering      &&
+        !editor.ui.terminalShown)
     {
         if (editor.ui.visualizerMode == VISUAL_SPECTRUM)
         {
             // spectrum analyzer
+
             for (i = 0; i < SPECTRUM_BAR_NUM; ++i)
             {
-                ptr32Src = spectrumAnaBMP + (SPECTRUM_BAR_HEIGHT - 1);
-                ptr32Dst = pixelBuffer    + ((59 * SCREEN_W) + (129 + (i * (SPECTRUM_BAR_WIDTH + 2))));
-                pixel    = palette[PAL_GENBKG];
-                tmpVol   = editor.spectrumVolumes[i];
+                srcPtr = spectrumAnaBMP;
+                dstPtr = &pixelBuffer[(59 * SCREEN_W) + (129 + (i * (SPECTRUM_BAR_WIDTH + 2)))];
+                pixel  = palette[PAL_GENBKG];
+                tmpVol = editor.spectrumVolumes[i];
 
-                y = SPECTRUM_BAR_HEIGHT;
-                while (y--)
+                for (y = (SPECTRUM_BAR_HEIGHT - 1); y >= 0; --y)
                 {
                     if (y < tmpVol)
-                        pixel  = *ptr32Src;
+                        pixel = srcPtr[y];
 
-                    *(ptr32Dst + 0) = pixel;
-                    *(ptr32Dst + 1) = pixel;
-                    *(ptr32Dst + 2) = pixel;
-                    *(ptr32Dst + 3) = pixel;
-                    *(ptr32Dst + 4) = pixel;
-                    *(ptr32Dst + 5) = pixel;
+                    for (x = 0; x < 6; ++x)
+                        dstPtr[x] = pixel;
 
-                    --ptr32Src;
-                    ptr32Dst += SCREEN_W;
+                    dstPtr += SCREEN_W;
                 }
             }
         }
@@ -1157,22 +1091,21 @@ void updateVisualizer(void)
 void renderQuadrascopeBg(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
-    ptr32Src = trackerFrameBMP  + (44 * SCREEN_W) + 120;
-    ptr32Dst = pixelBuffer      + (44 * SCREEN_W) + 120;
+    srcPtr = &trackerFrameBMP[(44 * SCREEN_W) + 120];
+    dstPtr =     &pixelBuffer[(44 * SCREEN_W) + 120];
 
-    y = 55;
-    while (y--)
+    for (y = 0; y < 55; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 200 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 200 * sizeof (int32_t));
 
-        ptr32Src += SCREEN_W;
-        ptr32Dst += SCREEN_W;
+        srcPtr += SCREEN_W;
+        dstPtr += SCREEN_W;
     }
 
-    // fix two pixels in the tracker GUI
+    // fix two pixels in the tracker GUI (after being in monoscope mode)
     pixelBuffer[(99 * SCREEN_W) + 318] = palette[PAL_BORDER];
     pixelBuffer[(99 * SCREEN_W) + 319] = palette[PAL_GENBKG];
 }
@@ -1180,22 +1113,21 @@ void renderQuadrascopeBg(void)
 void renderSpectrumAnalyzerBg(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
-    ptr32Src = spectrumVisualsBMP;
-    ptr32Dst = pixelBuffer + (44 * SCREEN_W) + 120;
+    srcPtr = spectrumVisualsBMP;
+    dstPtr = &pixelBuffer[(44 * SCREEN_W) + 120];
 
-    y = 55;
-    while (y--)
+    for (y = 0; y < 55; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 200 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 200 * sizeof (int32_t));
 
-        ptr32Src += 200;
-        ptr32Dst += SCREEN_W;
+        srcPtr += 200;
+        dstPtr += SCREEN_W;
     }
 
-    // fix two pixels in the tracker GUI
+    // fix two pixels in the tracker GUI (after being in monoscope mode)
     pixelBuffer[(99 * SCREEN_W) + 318] = palette[PAL_BORDER];
     pixelBuffer[(99 * SCREEN_W) + 319] = palette[PAL_GENBKG];
 }
@@ -1203,19 +1135,18 @@ void renderSpectrumAnalyzerBg(void)
 void renderMonoscopeBg(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
-    ptr32Src = monoScopeBMP;
-    ptr32Dst = pixelBuffer + (44 * SCREEN_W) + 120;
+    srcPtr = monoScopeBMP;
+    dstPtr = &pixelBuffer[(44 * SCREEN_W) + 120];
 
-    y = 55;
-    while (y--)
+    for (y = 0; y < 55; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 200 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 200 * sizeof (int32_t));
 
-        ptr32Src += 200;
-        ptr32Dst += SCREEN_W;
+        srcPtr += 200;
+        dstPtr += SCREEN_W;
     }
 
     // change two pixels in the tracker GUI
@@ -1226,105 +1157,105 @@ void renderMonoscopeBg(void)
 void renderAboutScreen(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
-    if (!editor.ui.diskOpScreenShown && !editor.ui.posEdScreenShown &&
-        !editor.ui.editOpScreenShown &&  editor.ui.aboutScreenShown)
+    if (!editor.ui.aboutScreenShown)
+        return;
+
+    if (!editor.ui.diskOpScreenShown && !editor.ui.posEdScreenShown && !editor.ui.editOpScreenShown)
     {
-        ptr32Src = aboutScreenBMP;
-        ptr32Dst = pixelBuffer + (44 * SCREEN_W) + 120;
+        srcPtr = aboutScreenBMP;
+        dstPtr = &pixelBuffer[(44 * SCREEN_W) + 120];
 
-        y = 55;
-        while (y--)
+        for (y = 0; y < 55; ++y)
         {
-            memcpy(ptr32Dst, ptr32Src, 200 * sizeof (int32_t));
+            memcpy(dstPtr, srcPtr, 200 * sizeof (int32_t));
 
-            ptr32Src += 200;
-            ptr32Dst += SCREEN_W;
+            srcPtr += 200;
+            dstPtr += SCREEN_W;
         }
+
+        // fix two pixels in the tracker GUI (after being in monoscope mode)
+        pixelBuffer[(99 * SCREEN_W) + 318] = palette[PAL_BORDER];
+        pixelBuffer[(99 * SCREEN_W) + 319] = palette[PAL_GENBKG];
     }
 }
 
 void renderEditOpMode(void)
 {
-    uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    uint8_t x, y;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
     // select what character box to render
+
     switch (editor.ui.editOpScreen)
     {
         default:
         case 0:
-            ptr32Src = &editOpModeCharsBMP[editor.sampleAllFlag ? EDOP_MODE_BMP_A_OFS : EDOP_MODE_BMP_S_OFS];
+            srcPtr = &editOpModeCharsBMP[editor.sampleAllFlag ? EDOP_MODE_BMP_A_OFS : EDOP_MODE_BMP_S_OFS];
         break;
 
         case 1:
         {
-                 if (editor.trackPattFlag == 0) ptr32Src = &editOpModeCharsBMP[EDOP_MODE_BMP_T_OFS];
-            else if (editor.trackPattFlag == 1) ptr32Src = &editOpModeCharsBMP[EDOP_MODE_BMP_P_OFS];
-            else                                ptr32Src = &editOpModeCharsBMP[EDOP_MODE_BMP_S_OFS];
+                 if (editor.trackPattFlag == 0) srcPtr = &editOpModeCharsBMP[EDOP_MODE_BMP_T_OFS];
+            else if (editor.trackPattFlag == 1) srcPtr = &editOpModeCharsBMP[EDOP_MODE_BMP_P_OFS];
+            else                                srcPtr = &editOpModeCharsBMP[EDOP_MODE_BMP_S_OFS];
         }
         break;
 
         case 2:
-            ptr32Src = &editOpModeCharsBMP[editor.halfClipFlag ? EDOP_MODE_BMP_C_OFS : EDOP_MODE_BMP_H_OFS];
+            srcPtr = &editOpModeCharsBMP[editor.halfClipFlag ? EDOP_MODE_BMP_C_OFS : EDOP_MODE_BMP_H_OFS];
         break;
 
         case 3:
-            ptr32Src = (editor.newOldFlag == 0) ? &editOpModeCharsBMP[EDOP_MODE_BMP_N_OFS] : &editOpModeCharsBMP[EDOP_MODE_BMP_O_OFS];
+            srcPtr = (editor.newOldFlag == 0) ? &editOpModeCharsBMP[EDOP_MODE_BMP_N_OFS] : &editOpModeCharsBMP[EDOP_MODE_BMP_O_OFS];
         break;
     }
 
     // render it...
-    ptr32Dst = pixelBuffer + (47 * SCREEN_W) + 310;
-    y = 6;
-    while (y--)
-    {
-        *(ptr32Dst + 0) = *(ptr32Src + 0);
-        *(ptr32Dst + 1) = *(ptr32Src + 1);
-        *(ptr32Dst + 2) = *(ptr32Src + 2);
-        *(ptr32Dst + 3) = *(ptr32Src + 3);
-        *(ptr32Dst + 4) = *(ptr32Src + 4);
-        *(ptr32Dst + 5) = *(ptr32Src + 5);
-        *(ptr32Dst + 6) = *(ptr32Src + 6);
 
-        ptr32Src += 7;
-        ptr32Dst += SCREEN_W;
+    dstPtr = &pixelBuffer[(47 * SCREEN_W) + 310];
+    for (y = 0; y < 6; ++y)
+    {
+        for (x = 0; x < 7; ++x)
+            dstPtr[x] = srcPtr[x];
+
+        srcPtr += 7;
+        dstPtr += SCREEN_W;
     }
 }
 
 void renderEditOpScreen(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
     // select which background to render
     switch (editor.ui.editOpScreen)
     {
         default:
-        case 0: ptr32Src = editOpScreen1BMP; break;
-        case 1: ptr32Src = editOpScreen2BMP; break;
-        case 2: ptr32Src = editOpScreen3BMP; break;
-        case 3: ptr32Src = editOpScreen4BMP; break;
+        case 0: srcPtr = editOpScreen1BMP; break;
+        case 1: srcPtr = editOpScreen2BMP; break;
+        case 2: srcPtr = editOpScreen3BMP; break;
+        case 3: srcPtr = editOpScreen4BMP; break;
     }
 
     // render background
-    ptr32Dst = pixelBuffer + (44 * SCREEN_W) + 120;
-    y = 55;
-    while (y--)
+    dstPtr = &pixelBuffer[(44 * SCREEN_W) + 120];
+    for (y = 0; y < 55; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 200 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 200 * sizeof (int32_t));
 
-        ptr32Src += 200;
-        ptr32Dst += SCREEN_W;
+        srcPtr += 200;
+        dstPtr += SCREEN_W;
     }
 
     renderEditOpMode();
 
-    // render content
+    // render text and content
     if (editor.ui.editOpScreen == 0)
     {
         textOut(pixelBuffer, 128, 47, "  TRACK      PATTERN  ", palette[PAL_GENTXT]);
@@ -1373,18 +1304,16 @@ void removeTerminalScreen(void)
     {
         memcpy(&pixelBuffer[(121 * SCREEN_W)], samplerScreenBMP, 320 * 134 * sizeof (int32_t));
 
-        editor.ui.updateStatusText = true;
-        editor.ui.updateSongSize = true;
-        editor.ui.updateSongTiming = true;
+        editor.ui.updateStatusText   = true;
+        editor.ui.updateSongSize     = true;
+        editor.ui.updateSongTiming   = true;
         editor.ui.updateResampleNote = true;
-        editor.ui.update9xxPos = true;
+        editor.ui.update9xxPos       = true;
 
         displaySample();
 
-        if (editor.ui.samplerVolBoxShown)
-            renderSamplerVolBox();
-        else if (editor.ui.samplerFiltersBoxShown)
-            renderSamplerFiltersBox();
+             if (editor.ui.samplerVolBoxShown)     renderSamplerVolBox();
+        else if (editor.ui.samplerFiltersBoxShown) renderSamplerFiltersBox();
     }
     else
     {
@@ -1395,27 +1324,25 @@ void removeTerminalScreen(void)
 void renderMOD2WAVDialog(void)
 {
     uint8_t y;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
-    ptr32Src = mod2wavBMP;
-    ptr32Dst = pixelBuffer + ((27 * SCREEN_W) + 64);
+    srcPtr = mod2wavBMP;
+    dstPtr = &pixelBuffer[(27 * SCREEN_W) + 64];
 
-    y = 48;
-    while (y--)
+    for (y = 0; y < 48; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 192 * sizeof (int32_t));
+        memcpy(dstPtr, srcPtr, 192 * sizeof (int32_t));
 
-        ptr32Src += 192;
-        ptr32Dst += SCREEN_W;
+        srcPtr += 192;
+        dstPtr += SCREEN_W;
     }
 }
 
 void updateMOD2WAVDialog(void)
 {
     uint8_t x, y, barLength, percent;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst, pixel;
+    uint32_t *dstPtr, bgPixel, pixel;
 
     if (editor.ui.updateMod2WavDialog)
     {
@@ -1452,34 +1379,23 @@ void updateMOD2WAVDialog(void)
             }
             else
             {
-                // clear progress bar background
-                ptr32Src = mod2wavBMP + ((15 * 192) + 6);
-                ptr32Dst = pixelBuffer + ((42 * SCREEN_W) + 70);
-                y = 11;
-                while (y--)
-                {
-                    memcpy(ptr32Dst, ptr32Src, 180 * sizeof (int32_t));
-                    ptr32Dst += SCREEN_W;
-                }
-
                 // render progress bar
                 percent = getSongProgressInPercentage();
                 if (percent > 100)
                     percent = 100;
 
-                barLength = (uint8_t)(((float)(percent) * (180.0f / 100.0f)) + 0.5f);
+                barLength = (uint8_t)((percent * (180.0f / 100.0f)) + 0.5f);
 
-                ptr32Dst = pixelBuffer + ((42 * SCREEN_W) + 70);
-                pixel    = palette[PAL_GENBKG2];
+                dstPtr  = &pixelBuffer[(42 * SCREEN_W) + 70];
+                pixel   = palette[PAL_GENBKG2];
+                bgPixel = palette[PAL_BORDER];
 
-                y = 11;
-                while (y--)
+                for (y = 0; y < 11; ++y)
                 {
-                    x = barLength;
-                    while (x--)
-                        *ptr32Dst++ = pixel;
+                    for (x = 0; x < 180; ++x)
+                        dstPtr[x] = (x < barLength) ? pixel : bgPixel;
 
-                    ptr32Dst += (SCREEN_W - barLength);
+                    dstPtr += SCREEN_W;
                 }
 
                 // render percentage
@@ -1511,43 +1427,37 @@ void updateEditOp(void)
             if (editor.ui.updateQuantizeText)
             {
                 editor.ui.updateQuantizeText = false;
-                printTwoDecimalsBg(pixelBuffer, 192, 69, *editor.quantizeValueDisp,
-                    palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                printTwoDecimalsBg(pixelBuffer, 192, 69, *editor.quantizeValueDisp, palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
 
             if (editor.ui.updateMetro1Text)
             {
                 editor.ui.updateMetro1Text = false;
-                printTwoDecimalsBg(pixelBuffer, 168, 80, *editor.metroSpeedDisp,
-                    palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                printTwoDecimalsBg(pixelBuffer, 168, 80, *editor.metroSpeedDisp, palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
 
             if (editor.ui.updateMetro2Text)
             {
                 editor.ui.updateMetro2Text = false;
-                printTwoDecimalsBg(pixelBuffer, 192, 80, *editor.metroChannelDisp,
-                    palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                printTwoDecimalsBg(pixelBuffer, 192, 80, *editor.metroChannelDisp, palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
 
             if (editor.ui.updateFromText)
             {
                 editor.ui.updateFromText = false;
-                printTwoHexBg(pixelBuffer, 264, 80, *editor.sampleFromDisp,
-                    palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                printTwoHexBg(pixelBuffer, 264, 80, *editor.sampleFromDisp, palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
 
             if (editor.ui.updateKeysText)
             {
                 editor.ui.updateKeysText = false;
-                textOutBg(pixelBuffer, 160, 91, editor.multiFlag ? "MULTI " : "SINGLE",
-                    palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                textOutBg(pixelBuffer, 160, 91, editor.multiFlag ? "MULTI " : "SINGLE", palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
 
             if (editor.ui.updateToText)
             {
                 editor.ui.updateToText = false;
-                printTwoHexBg(pixelBuffer, 264, 91, *editor.sampleToDisp,
-                    palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                printTwoHexBg(pixelBuffer, 264, 91, *editor.sampleToDisp, palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
         }
         else if (editor.ui.editOpScreen == 2)
@@ -1562,16 +1472,14 @@ void updateEditOp(void)
                 }
                 else
                 {
-                    textOutBg(pixelBuffer, 128, 47, "    SAMPLE EDITOR     ",
-                        palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                    textOutBg(pixelBuffer, 128, 47, "    SAMPLE EDITOR     ", palette[PAL_GENTXT], palette[PAL_GENBKG]);
                 }
             }
 
             if (editor.ui.updatePosText)
             {
                 editor.ui.updatePosText = false;
-                printFiveHexBg(pixelBuffer, 240, 58, *editor.samplePosDisp,
-                    palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                printFiveHexBg(pixelBuffer, 240, 58, *editor.samplePosDisp, palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
 
             if (editor.ui.updateModText)
@@ -1590,8 +1498,7 @@ void updateEditOp(void)
             if (editor.ui.updateVolText)
             {
                 editor.ui.updateVolText = false;
-                printThreeDecimalsBg(pixelBuffer, 248, 91, *editor.sampleVolDisp,
-                    palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                printThreeDecimalsBg(pixelBuffer, 248, 91, *editor.sampleVolDisp, palette[PAL_GENTXT], palette[PAL_GENBKG]);
             }
         }
         else if (editor.ui.editOpScreen == 3)
@@ -1739,7 +1646,7 @@ void displayMainScreen(void)
                 else
                 {
                          if (editor.ui.visualizerMode == VISUAL_QUADRASCOPE) renderQuadrascopeBg();
-                    else if (editor.ui.visualizerMode == VISUAL_SPECTRUM   ) renderSpectrumAnalyzerBg();
+                    else if (editor.ui.visualizerMode == VISUAL_SPECTRUM)    renderSpectrumAnalyzerBg();
                     else                                                     renderMonoscopeBg();
                 }
             }
@@ -2669,44 +2576,48 @@ void hideSprite(uint8_t sprite)
 void eraseSprites(void)
 {
     int8_t i;
-    uint16_t x, y, sx, sy, sw, sh, dstAdd;
-    const uint32_t *src32;
-    uint32_t *dst32;
+    uint16_t x, y, sx, sy, sw, sh, dstPitch;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr;
 
     for (i = (SPRITE_NUM - 1); i >= 0; --i) // reverse order, or else it will mess up
     {
-        if ((sprites[i].y >= SCREEN_H) || (sprites[i].x >= SCREEN_W)) continue;
-
-        sw = sprites[i].w;
-        sh = sprites[i].h;
         sx = sprites[i].x;
         sy = sprites[i].y;
 
-        src32  = sprites[i].refreshBuffer;
-        if (src32 == NULL)
+        if ((sx >= SCREEN_W) || (sy >= SCREEN_H))
+            continue;
+
+        srcPtr = sprites[i].refreshBuffer;
+        if (srcPtr == NULL)
             return;
 
-        dst32  = pixelBuffer + ((sy * SCREEN_W) + sx);
-        dstAdd = SCREEN_W - sw;
+        sw = sprites[i].w;
+        sh = sprites[i].h;
+
+        dstPtr   = &pixelBuffer[(sy * SCREEN_W) + sx];
+        dstPitch = SCREEN_W - sw;
 
         for (y = 0; y < sh; ++y)
         {
-            if ((y + sy) >= SCREEN_H) break;
+            if ((y + sy) >= SCREEN_H)
+                break;
 
             for (x = 0; x < sw; ++x)
             {
                 if ((x + sx) >= SCREEN_W)
                 {
                     x = sw - x;
-                    dst32 += x;
-                    src32 += x;
+                    dstPtr += x;
+                    srcPtr += x;
+
                     break;
                 }
 
-                *dst32++ = *src32++;
+                *dstPtr++ = *srcPtr++;
             }
 
-            dst32 += dstAdd;
+            dstPtr += dstPitch;
         }
     }
 
@@ -2716,10 +2627,10 @@ void eraseSprites(void)
 void renderSprites(void)
 {
     uint8_t i;
-    const uint8_t *src8;
-    uint16_t x, y, sx, sy, sw, sh, pitch;
-    const uint32_t *src32;
-    uint32_t *dst32, *clr32, colorKey;
+    const uint8_t *src8Ptr;
+    uint16_t x, y, sx, sy, sw, sh, dstPitch;
+    const uint32_t *src32Ptr;
+    uint32_t *dst32Ptr, *clrPtr, colorKey;
 
     renderVuMeters(); // works differently, but let's put it here
 
@@ -2727,86 +2638,93 @@ void renderSprites(void)
     {
         sprites[i].x = sprites[i].newX;
         sprites[i].y = sprites[i].newY;
-        if ((sprites[i].y >= SCREEN_H) || (sprites[i].x >= SCREEN_W)) continue;
 
-        sw = sprites[i].w;
-        sh = sprites[i].h;
         sx = sprites[i].x;
         sy = sprites[i].y;
 
-        dst32 = pixelBuffer + ((sy * SCREEN_W) + sx);
-        clr32 = sprites[i].refreshBuffer;
-        if (clr32 == NULL)
+        if ((sx >= SCREEN_W) || (sy >= SCREEN_H))
+            continue;
+
+        sw = sprites[i].w;
+        sh = sprites[i].h;
+
+        clrPtr = sprites[i].refreshBuffer;
+        if (clrPtr == NULL)
             return;
 
-        pitch = SCREEN_W - sw;
+        dst32Ptr = &pixelBuffer[(sy * SCREEN_W) + sx];
+        dstPitch = SCREEN_W - sw;
 
         colorKey = sprites[i].colorKey;
         if (sprites[i].pixelType == SPRITE_TYPE_RGB)
         {
-            src32 = (uint32_t *)(sprites[i].data);
-            if (src32 == NULL)
+            src32Ptr = (uint32_t *)(sprites[i].data);
+            if (src32Ptr == NULL)
                 return;
 
             for (y = 0; y < sh; ++y)
             {
-                if ((y + sy) >= SCREEN_H) break;
+                if ((y + sy) >= SCREEN_H)
+                    break;
 
                 for (x = 0; x < sw; ++x)
                 {
                     if ((x + sx) >= SCREEN_W)
                     {
                         x = sw - x;
-                        clr32 += x;
-                        dst32 += x;
-                        src32 += x;
+                        clrPtr   += x;
+                        dst32Ptr += x;
+                        src32Ptr += x;
+
                         break;
                     }
 
-                    *clr32++ = *dst32; // fill refresh buffer
-                    if (*src32 != colorKey)
-                        *dst32  = *src32;
+                    *clrPtr++ = *dst32Ptr; // fill refresh buffer
+                    if (*src32Ptr != colorKey)
+                        *dst32Ptr  = *src32Ptr;
 
-                    dst32++;
-                    src32++;
+                    dst32Ptr++;
+                    src32Ptr++;
                 }
 
-                dst32 += pitch;
+                dst32Ptr += dstPitch;
             }
         }
         else
         {
-            src8 = (uint8_t *)(sprites[i].data);
-            if (src8 == NULL)
+            src8Ptr = (uint8_t *)(sprites[i].data);
+            if (src8Ptr == NULL)
                 return;
 
             for (y = 0; y < sh; ++y)
             {
-                if ((y + sy) >= SCREEN_H) break;
+                if ((y + sy) >= SCREEN_H)
+                    break;
 
                 for (x = 0; x < sw; ++x)
                 {
                     if ((x + sx) >= SCREEN_W)
                     {
                         x = sw - x;
-                        clr32 += x;
-                        dst32 += x;
-                        src8  += x;
+                        clrPtr   += x;
+                        dst32Ptr += x;
+                        src8Ptr  += x;
+
                         break;
                     }
 
-                    *clr32++ = *dst32; // fill refresh buffer
-                    if (*src8 != colorKey)
+                    *clrPtr++ = *dst32Ptr; // fill refresh buffer
+                    if (*src8Ptr != colorKey)
                     {
-                        if (*src8 < PALETTE_NUM)
-                            *dst32 = palette[*src8];
+                        if (*src8Ptr < PALETTE_NUM)
+                            *dst32Ptr = palette[*src8Ptr];
                     }
 
-                    dst32++;
-                    src8++;
+                    dst32Ptr++;
+                    src8Ptr++;
                 }
 
-                dst32 += pitch;
+                dst32Ptr += dstPitch;
             }
         }
     }
@@ -2893,8 +2811,7 @@ void sinkVisualizerBars(void)
 
 uint32_t _50HzCallBack(uint32_t interval, void *param)
 {
-    if ((editor.playMode != PLAY_MODE_PATTERN) ||
-        ((editor.currMode == MODE_RECORD) && (editor.recordMode != RECORD_PATT)))
+    if ((editor.playMode != PLAY_MODE_PATTERN) || ((editor.currMode == MODE_RECORD) && (editor.recordMode != RECORD_PATT)))
     {
         if (++editor.ticks50Hz == 50)
         {

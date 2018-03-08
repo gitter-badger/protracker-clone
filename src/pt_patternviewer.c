@@ -25,22 +25,13 @@ static uint8_t periodToNote(int16_t period)
     return (255); // illegal period
 }
 
-void drawPatternNormal(uint32_t *frameBuffer);
-void drawPatternDotted(uint32_t *frameBuffer);
-
-void redrawPattern(uint32_t *frameBuffer)
-{
-    if (editor.ui.pattDots)
-        drawPatternDotted(frameBuffer);
-    else
-        drawPatternNormal(frameBuffer);
-}
-
 void drawPatternNormal(uint32_t *frameBuffer)
 {
     int8_t rowMiddlePos;
-    uint8_t i, j, tempNote, rowDispCheck;
-    uint16_t y, y2, putXOffset, putYOffset, rowData;
+    uint8_t i, j, h, tempNote, rowDispCheck;
+    uint16_t putXOffset, putYOffset, rowData;
+    const uint32_t *srcPtr;
+    uint32_t bufferOffset, *dstPtr;
     note_t note;
 
     for (i = 0; i < 15; ++i)
@@ -92,8 +83,8 @@ void drawPatternNormal(uint32_t *frameBuffer)
                     }
 
                     printOneHexBigBg(frameBuffer, putXOffset + 38, putYOffset, note.sample & 0x0F, palette[PAL_GENTXT], palette[PAL_GENBKG]);
-                    printOneHexBigBg(frameBuffer, putXOffset + 46, putYOffset, note.command, palette[PAL_GENTXT], palette[PAL_GENBKG]);
-                    printTwoHexBigBg(frameBuffer, putXOffset + 54, putYOffset, note.param,  palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                    printOneHexBigBg(frameBuffer, putXOffset + 46, putYOffset, note.command,       palette[PAL_GENTXT], palette[PAL_GENBKG]);
+                    printTwoHexBigBg(frameBuffer, putXOffset + 54, putYOffset, note.param,         palette[PAL_GENTXT], palette[PAL_GENBKG]);
                 }
             }
             else
@@ -136,14 +127,35 @@ void drawPatternNormal(uint32_t *frameBuffer)
                     }
 
                     printOneHexBg(frameBuffer, putXOffset + 38, putYOffset, note.sample & 0x0F, palette[PAL_PATTXT], palette[PAL_BACKGRD]);
-                    printOneHexBg(frameBuffer, putXOffset + 46, putYOffset, note.command, palette[PAL_PATTXT], palette[PAL_BACKGRD]);
-                    printTwoHexBg(frameBuffer, putXOffset + 54, putYOffset, note.param, palette[PAL_PATTXT], palette[PAL_BACKGRD]);
+                    printOneHexBg(frameBuffer, putXOffset + 46, putYOffset, note.command,       palette[PAL_PATTXT], palette[PAL_BACKGRD]);
+                    printTwoHexBg(frameBuffer, putXOffset + 54, putYOffset, note.param,         palette[PAL_PATTXT], palette[PAL_BACKGRD]);
                 }
             }
         }
     }
 
-    // fill margin
+    // clear outside rows
+
+    if (modEntry->currRow <= 6)
+    {
+        srcPtr = &trackerFrameBMP[140 * SCREEN_W];
+        dstPtr =     &frameBuffer[140 * SCREEN_W];
+
+        memcpy(dstPtr, srcPtr, (SCREEN_W * sizeof (int32_t)) * ((7 - modEntry->currRow) * 7));
+    }
+    else if (modEntry->currRow >= 57)
+    {
+        h = (modEntry->currRow - 56) * 7;
+
+        bufferOffset = (250 - h) * SCREEN_W;
+
+        srcPtr = &trackerFrameBMP[bufferOffset];
+        dstPtr =     &frameBuffer[bufferOffset];
+
+        memcpy(dstPtr, srcPtr, (SCREEN_W * sizeof (int32_t)) * h);
+    }
+
+    /*
     if (modEntry->currRow <= 6)
     {
         y2 = 140 + ((7 -  modEntry->currRow) * 7);
@@ -156,6 +168,7 @@ void drawPatternNormal(uint32_t *frameBuffer)
         for (y = 245; y > y2; y -= 7)
             textOutBgNoSpace(frameBuffer, 9, y, "00 --000000 --000000 --000000 --000000", palette[PAL_BACKGRD], palette[PAL_BACKGRD]);
     }
+    */
 }
 
 void drawPatternDotted(uint32_t *frameBuffer)
@@ -296,4 +309,12 @@ void drawPatternDotted(uint32_t *frameBuffer)
         for (y = 245; y > y2; y -= 7)
             textOutBgNoSpace(frameBuffer, 9, y, "00 --000000 --000000 --000000 --000000", palette[PAL_BACKGRD], palette[PAL_BACKGRD]);
     }
+}
+
+void redrawPattern(uint32_t *frameBuffer)
+{
+    if (editor.ui.pattDots)
+        drawPatternDotted(frameBuffer);
+    else
+        drawPatternNormal(frameBuffer);
 }

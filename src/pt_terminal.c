@@ -374,9 +374,9 @@ static void renderDate(uint32_t *frameBuffer)
 
 void terminalRender(uint32_t *frameBuffer)
 {
-    int32_t y, x;
-    const uint32_t *ptr32Src;
-    uint32_t *ptr32Dst, pixel;
+    int32_t y, x, h;
+    const uint32_t *srcPtr;
+    uint32_t *dstPtr, pixel;
 
     // hide some sprites...
     hideSprite(SPRITE_PATTERN_CURSOR);
@@ -391,36 +391,31 @@ void terminalRender(uint32_t *frameBuffer)
     memcpy(frameBuffer, termTopBMP, 320 * 11 * sizeof (uint32_t));
 
     // render scrollbar graphics
-    ptr32Src = termScrollBarBMP;
-    ptr32Dst = frameBuffer + ((11 * SCREEN_W) + 309);
 
-    y = 232;
-    while (y--)
+    srcPtr = termScrollBarBMP;
+    dstPtr = &frameBuffer[(11 * SCREEN_W) + 309];
+
+    for (y = 0; y < 232; ++y)
     {
-        memcpy(ptr32Dst, ptr32Src, 11 * sizeof (uint32_t));
+        memcpy(dstPtr, srcPtr, 11 * sizeof (uint32_t));
 
-        ptr32Dst += SCREEN_W;
-        ptr32Src += 11;
+        dstPtr += SCREEN_W;
+        srcPtr += 11;
     }
 
     // render scrollbar thumb
     if (scrollBarEnd > scrollBarPage)
     {
-        ptr32Dst = frameBuffer + ((scrollBarThumbTop * SCREEN_W) + 311);
-        pixel    = palette[PAL_GENBKG2];
+        dstPtr = &frameBuffer[(scrollBarThumbTop * SCREEN_W) + 311];
+        pixel  = palette[PAL_GENBKG2];
 
-        y = scrollBarThumbBottom - scrollBarThumbTop;
-        while (y--)
+        h = scrollBarThumbBottom - scrollBarThumbTop;
+        for (y = 0; y < h; ++y)
         {
-            *(ptr32Dst + 0) = pixel;
-            *(ptr32Dst + 1) = pixel;
-            *(ptr32Dst + 2) = pixel;
-            *(ptr32Dst + 3) = pixel;
-            *(ptr32Dst + 4) = pixel;
-            *(ptr32Dst + 5) = pixel;
-            *(ptr32Dst + 6) = pixel;
+            for (x = 0; x < 7; ++x)
+                dstPtr[x] = pixel;
 
-            ptr32Dst += SCREEN_W;
+            dstPtr += SCREEN_W;
         }
     }
 
@@ -479,9 +474,9 @@ int8_t terminalInit(void)
             *dst++ = (byte & (1 << bit)) >> bit;
     }
 
-    textFgColor = 0x00C0C0C0;
-    dateFgColor = 0x00909090;
-    dateBgColor = 0x00282828;
+    textFgColor = 0xC0C0C0;
+    dateFgColor = 0x909090;
+    dateBgColor = 0x282828;
 
     scrollBarPage = TERMINAL_HEIGHT - 1;
     terminalClear();
