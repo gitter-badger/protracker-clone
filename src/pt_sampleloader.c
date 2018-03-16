@@ -1,7 +1,10 @@
-#include <SDL2/SDL.h>
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
 #include <math.h> // round()/roundf()
 #include <ctype.h> // tolower()/toupper()
@@ -1149,7 +1152,7 @@ int8_t saveSample(int8_t checkIfFileExist, int8_t giveNewFreeFilename)
     char fileName[48];
     uint8_t smp;
     uint16_t j;
-    int32_t i, sampleTextLen;
+    int32_t i, sampleTextLen, fileExtPos;
     uint32_t sampleSize, iffSize, iffSampleSize;
     uint32_t loopStart, loopLen, tmp32;
     FILE *f;
@@ -1194,8 +1197,9 @@ int8_t saveSample(int8_t checkIfFileExist, int8_t giveNewFreeFilename)
     }
 
     // remove .wav/.iff from end of sample name (if present)
-    if (!strncmp(fileName + (strlen(fileName) - 4), ".wav", 4) || !strncmp(fileName + (strlen(fileName) - 4), ".iff", 4))
-        fileName[strlen(fileName) - 4] = '\0';
+    fileExtPos = strlen(fileName) - 4;
+    if (!strncmp(&fileName[fileExtPos], ".wav", 4) || !strncmp(&fileName[fileExtPos], ".iff", 4))
+        fileName[fileExtPos] = '\0';
 
     switch (editor.diskop.smpSaveType)
     {
@@ -1239,8 +1243,9 @@ int8_t saveSample(int8_t checkIfFileExist, int8_t giveNewFreeFilename)
                     }
 
                     // remove .wav/.iff from end of sample name (if present)
-                    if (!strncmp(fileName + (strlen(fileName) - 4), ".wav", 4) || !strncmp(fileName + (strlen(fileName) - 4), ".iff", 4))
-                        fileName[strlen(fileName) - 4] = '\0';
+                    fileExtPos = strlen(fileName) - 4;
+                    if (!strncmp(&fileName[fileExtPos], ".wav", 4) || !strncmp(&fileName[fileExtPos], ".iff", 4))
+                        fileName[fileExtPos] = '\0';
 
                     sprintf(fileName, "%s-%d", fileName, j);
                 }

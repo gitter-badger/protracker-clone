@@ -2,9 +2,13 @@
 ** using the WTFPL license for the code.
 */
 
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
 #include <SDL2/SDL.h>
 #ifdef _WIN32
@@ -701,16 +705,14 @@ void outputAudio(int16_t *target, int32_t numSamples)
     }
 }
 
-void audioCallback(void *userdata, uint8_t *stream, int32_t len)
+void SDLCALL audioCallback(void *userdata, Uint8 *stream, int len)
 {
     int16_t *out;
     int32_t sampleBlock, samplesTodo;
 
-    (void)(userdata); // make compiler happy
-
-    if (forceMixerOff) // for MOD2WAV
+    if (forceMixerOff) // during MOD2WAV
     {
-        memset(stream, 0, len); // mute
+        memset(stream, 0, len);
         return;
     }
 
@@ -723,7 +725,7 @@ void audioCallback(void *userdata, uint8_t *stream, int32_t len)
         if (samplesTodo > 0)
         {
             outputAudio(out, samplesTodo);
-            out += (2 * samplesTodo);
+            out += (samplesTodo * 2);
 
             sampleBlock   -= samplesTodo;
             sampleCounter -= samplesTodo;
@@ -736,6 +738,8 @@ void audioCallback(void *userdata, uint8_t *stream, int32_t len)
             sampleCounter = samplesPerTick;
         }
     }
+
+    (void)(userdata); // make compiler happy
 }
 
 static void calculateFilterCoeffs(void)

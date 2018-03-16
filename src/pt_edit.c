@@ -1,4 +1,8 @@
-#include <SDL2/SDL.h>
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #include <stdint.h>
 #include <ctype.h> // tolower()
 #include <fcntl.h>

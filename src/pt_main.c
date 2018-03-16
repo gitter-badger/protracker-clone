@@ -1,8 +1,11 @@
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
-#include <SDL2/SDL.h>
 #ifdef _WIN32
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
@@ -95,6 +98,11 @@ int main(int argc, char *argv[])
     endianTest.a = 1;
     bigEndian = endianTest.b[3];
     // ----------------------------
+
+    // for finding memory leaks in debug mode with Visual Studio
+#if defined _DEBUG && defined _MSC_VER
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 
 #if SDL_PATCHLEVEL < 5
     #pragma message("WARNING: The SDL2 dev lib is older than ver 2.0.5. You'll get fullscreen mode issues.")

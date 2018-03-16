@@ -1,6 +1,9 @@
-#include <SDL2/SDL.h>
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #include <stdint.h>
-#include <string.h>
 #include "pt_header.h"
 #include "pt_helpers.h"
 #include "pt_visuals.h"

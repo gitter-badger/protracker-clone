@@ -1,7 +1,10 @@
-#include <SDL2/SDL.h>
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
 #include <math.h> // roundf()
 #include "pt_header.h"

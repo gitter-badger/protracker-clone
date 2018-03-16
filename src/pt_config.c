@@ -1,6 +1,10 @@
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
 #ifndef _WIN32
 #include <unistd.h>
@@ -41,7 +45,7 @@ FILE *loadPTDotConfig(void)
 
 int8_t loadConfig(void)
 {
-    char cfgString[19], *configBuffer;
+    char cfgString[19], *configBuffer, *configLine;
     uint8_t r, g, b, tmp8, iniConfigFound, ptConfigFound;
     uint16_t tmp16;
     int32_t lineLen;
@@ -108,179 +112,179 @@ int8_t loadConfig(void)
         fread(configBuffer, 1, configFileSize, configFile);
         fclose(configFile);
 
-        configBuffer = strtok(configBuffer, "\n");
-        while (configBuffer != NULL)
+        configLine = strtok(configBuffer, "\n");
+        while (configLine != NULL)
         {
-            lineLen = strlen(configBuffer);
+            lineLen = strlen(configLine);
 
             // remove CR in CRLF linefeed (if present)
-            if (configBuffer[lineLen - 1] == '\r')
+            if (configLine[lineLen - 1] == '\r')
             {
-                configBuffer[lineLen - 1] = '\0';
+                configLine[lineLen - 1] = '\0';
                 lineLen--;
             }
 
             // COMMENT OR CATEGORY
-            if ((*configBuffer == ';') || (*configBuffer == '['))
+            if ((*configLine == ';') || (*configLine == '['))
             {
-                configBuffer = strtok(NULL, "\n");
+                configLine = strtok(NULL, "\n");
                 continue;
             }
 
             // AUTOCLOSEDISKOP
-            else if (strncmp(configBuffer, "AUTOCLOSEDISKOP=", 16) == 0)
+            else if (strncmp(configLine, "AUTOCLOSEDISKOP=", 16) == 0)
             {
-                     if (strncmp(&configBuffer[16], "TRUE",  4) == 0) ptConfig.autoCloseDiskOp = true;
-                else if (strncmp(&configBuffer[16], "FALSE", 5) == 0) ptConfig.autoCloseDiskOp = false;
+                     if (strncmp(&configLine[16], "TRUE",  4) == 0) ptConfig.autoCloseDiskOp = true;
+                else if (strncmp(&configLine[16], "FALSE", 5) == 0) ptConfig.autoCloseDiskOp = false;
             }
 
             // VBLANKSCOPES
-            else if (strncmp(configBuffer, "VBLANKSCOPES=", 13) == 0)
+            else if (strncmp(configLine, "VBLANKSCOPES=", 13) == 0)
             {
-                     if (strncmp(&configBuffer[13], "TRUE",  4) == 0) ptConfig.vblankScopes = true;
-                else if (strncmp(&configBuffer[13], "FALSE", 5) == 0) ptConfig.vblankScopes = false;
+                     if (strncmp(&configLine[13], "TRUE",  4) == 0) ptConfig.vblankScopes = true;
+                else if (strncmp(&configLine[13], "FALSE", 5) == 0) ptConfig.vblankScopes = false;
             }
 
             // COMPOMODE
-            else if (strncmp(configBuffer, "COMPOMODE=", 10) == 0)
+            else if (strncmp(configLine, "COMPOMODE=", 10) == 0)
             {
-                     if (strncmp(&configBuffer[10], "TRUE",  4) == 0) ptConfig.compoMode = true;
-                else if (strncmp(&configBuffer[10], "FALSE", 5) == 0) ptConfig.compoMode = false;
+                     if (strncmp(&configLine[10], "TRUE",  4) == 0) ptConfig.compoMode = true;
+                else if (strncmp(&configLine[10], "FALSE", 5) == 0) ptConfig.compoMode = false;
             }
 
             // PATTDOTS
-            else if (strncmp(configBuffer, "PATTDOTS=", 9) == 0)
+            else if (strncmp(configLine, "PATTDOTS=", 9) == 0)
             {
-                     if (strncmp(&configBuffer[9], "TRUE",  4) == 0) ptConfig.pattDots = true;
-                else if (strncmp(&configBuffer[9], "FALSE", 5) == 0) ptConfig.pattDots = false;
+                     if (strncmp(&configLine[9], "TRUE",  4) == 0) ptConfig.pattDots = true;
+                else if (strncmp(&configLine[9], "FALSE", 5) == 0) ptConfig.pattDots = false;
             }
 
             // BLANKZERO
-            else if (strncmp(configBuffer, "BLANKZERO=", 10) == 0)
+            else if (strncmp(configLine, "BLANKZERO=", 10) == 0)
             {
-                     if (strncmp(&configBuffer[10], "TRUE",  4) == 0) ptConfig.blankZeroFlag = true;
-                else if (strncmp(&configBuffer[10], "FALSE", 5) == 0) ptConfig.blankZeroFlag = false;
+                     if (strncmp(&configLine[10], "TRUE",  4) == 0) ptConfig.blankZeroFlag = true;
+                else if (strncmp(&configLine[10], "FALSE", 5) == 0) ptConfig.blankZeroFlag = false;
             }
 
             // REALVUMETERS
-            else if (strncmp(configBuffer, "REALVUMETERS=", 13) == 0)
+            else if (strncmp(configLine, "REALVUMETERS=", 13) == 0)
             {
-                     if (strncmp(&configBuffer[13], "TRUE",  4) == 0) ptConfig.realVuMeters = true;
-                else if (strncmp(&configBuffer[13], "FALSE", 5) == 0) ptConfig.realVuMeters = false;
+                     if (strncmp(&configLine[13], "TRUE",  4) == 0) ptConfig.realVuMeters = true;
+                else if (strncmp(&configLine[13], "FALSE", 5) == 0) ptConfig.realVuMeters = false;
             }
 
             // ACCIDENTAL
-            else if (strncmp(configBuffer, "ACCIDENTAL=", 11) == 0)
+            else if (strncmp(configLine, "ACCIDENTAL=", 11) == 0)
             {
-                     if (strncmp(&configBuffer[11], "SHARP",  4) == 0) ptConfig.accidental = 0;
-                else if (strncmp(&configBuffer[11], "FLAT",   5) == 0) ptConfig.accidental = 1;
+                     if (strncmp(&configLine[11], "SHARP",  4) == 0) ptConfig.accidental = 0;
+                else if (strncmp(&configLine[11], "FLAT",   5) == 0) ptConfig.accidental = 1;
             }
 
             // QUANTIZE
-            else if (strncmp(configBuffer, "QUANTIZE=", 9) == 0)
+            else if (strncmp(configLine, "QUANTIZE=", 9) == 0)
             {
-                if (configBuffer[9] != '\0')
-                    ptConfig.quantizeValue = (int16_t)(CLAMP(atoi(&configBuffer[9]), 0, 63));
+                if (configLine[9] != '\0')
+                    ptConfig.quantizeValue = (int16_t)(CLAMP(atoi(&configLine[9]), 0, 63));
             }
 
             // TRANSDEL
-            else if (strncmp(configBuffer, "TRANSDEL=", 9) == 0)
+            else if (strncmp(configLine, "TRANSDEL=", 9) == 0)
             {
-                     if (strncmp(&configBuffer[9], "TRUE",  4) == 0) ptConfig.transDel = true;
-                else if (strncmp(&configBuffer[9], "FALSE", 5) == 0) ptConfig.transDel = false;
+                     if (strncmp(&configLine[9], "TRUE",  4) == 0) ptConfig.transDel = true;
+                else if (strncmp(&configLine[9], "FALSE", 5) == 0) ptConfig.transDel = false;
             }
 
             // DOTTEDCENTER
-            else if (strncmp(configBuffer, "DOTTEDCENTER=", 13) == 0)
+            else if (strncmp(configLine, "DOTTEDCENTER=", 13) == 0)
             {
-                     if (strncmp(&configBuffer[13], "TRUE",  4) == 0) ptConfig.dottedCenterFlag = true;
-                else if (strncmp(&configBuffer[13], "FALSE", 5) == 0) ptConfig.dottedCenterFlag = false;
+                     if (strncmp(&configLine[13], "TRUE",  4) == 0) ptConfig.dottedCenterFlag = true;
+                else if (strncmp(&configLine[13], "FALSE", 5) == 0) ptConfig.dottedCenterFlag = false;
             }
 
             // MODDOT
-            else if (strncmp(configBuffer, "MODDOT=", 7) == 0)
+            else if (strncmp(configLine, "MODDOT=", 7) == 0)
             {
-                     if (strncmp(&configBuffer[7], "TRUE",  4) == 0) ptConfig.modDot = true;
-                else if (strncmp(&configBuffer[7], "FALSE", 5) == 0) ptConfig.modDot = false;
+                     if (strncmp(&configLine[7], "TRUE",  4) == 0) ptConfig.modDot = true;
+                else if (strncmp(&configLine[7], "FALSE", 5) == 0) ptConfig.modDot = false;
             }
 
             // SCALE3X (deprecated)
-            else if (strncmp(configBuffer, "SCALE3X=", 8) == 0)
+            else if (strncmp(configLine, "SCALE3X=", 8) == 0)
             {
-                     if (strncmp(&configBuffer[8], "TRUE",  4) == 0) ptConfig.videoScaleFactor = 3;
-                else if (strncmp(&configBuffer[8], "FALSE", 5) == 0) ptConfig.videoScaleFactor = 2;
+                     if (strncmp(&configLine[8], "TRUE",  4) == 0) ptConfig.videoScaleFactor = 3;
+                else if (strncmp(&configLine[8], "FALSE", 5) == 0) ptConfig.videoScaleFactor = 2;
             }
 
             // VIDEOSCALE
-            else if (strncmp(configBuffer, "VIDEOSCALE=", 11) == 0)
+            else if (strncmp(configLine, "VIDEOSCALE=", 11) == 0)
             {
-                     if (strncmp(&configBuffer[11], "1X", 2) == 0) ptConfig.videoScaleFactor = 1;
-                else if (strncmp(&configBuffer[11], "2X", 2) == 0) ptConfig.videoScaleFactor = 2;
-                else if (strncmp(&configBuffer[11], "3X", 2) == 0) ptConfig.videoScaleFactor = 3;
-                else if (strncmp(&configBuffer[11], "4X", 2) == 0) ptConfig.videoScaleFactor = 4;
-                else if (strncmp(&configBuffer[11], "5X", 2) == 0) ptConfig.videoScaleFactor = 5;
-                else if (strncmp(&configBuffer[11], "6X", 2) == 0) ptConfig.videoScaleFactor = 6;
-                else if (strncmp(&configBuffer[11], "7X", 2) == 0) ptConfig.videoScaleFactor = 7;
-                else if (strncmp(&configBuffer[11], "8X", 2) == 0) ptConfig.videoScaleFactor = 8;
-                else if (strncmp(&configBuffer[11], "9X", 2) == 0) ptConfig.videoScaleFactor = 9;
+                     if (strncmp(&configLine[11], "1X", 2) == 0) ptConfig.videoScaleFactor = 1;
+                else if (strncmp(&configLine[11], "2X", 2) == 0) ptConfig.videoScaleFactor = 2;
+                else if (strncmp(&configLine[11], "3X", 2) == 0) ptConfig.videoScaleFactor = 3;
+                else if (strncmp(&configLine[11], "4X", 2) == 0) ptConfig.videoScaleFactor = 4;
+                else if (strncmp(&configLine[11], "5X", 2) == 0) ptConfig.videoScaleFactor = 5;
+                else if (strncmp(&configLine[11], "6X", 2) == 0) ptConfig.videoScaleFactor = 6;
+                else if (strncmp(&configLine[11], "7X", 2) == 0) ptConfig.videoScaleFactor = 7;
+                else if (strncmp(&configLine[11], "8X", 2) == 0) ptConfig.videoScaleFactor = 8;
+                else if (strncmp(&configLine[11], "9X", 2) == 0) ptConfig.videoScaleFactor = 9;
             }
 
             // BLEP
-            else if (strncmp(configBuffer, "BLEP=", 5) == 0)
+            else if (strncmp(configLine, "BLEP=", 5) == 0)
             {
-                     if (strncmp(&configBuffer[5], "TRUE",  4) == 0) ptConfig.blepSynthesis = true;
-                else if (strncmp(&configBuffer[5], "FALSE", 5) == 0) ptConfig.blepSynthesis = false;
+                     if (strncmp(&configLine[5], "TRUE",  4) == 0) ptConfig.blepSynthesis = true;
+                else if (strncmp(&configLine[5], "FALSE", 5) == 0) ptConfig.blepSynthesis = false;
             }
 
             // DEFAULTDIR
-            else if (strncmp(configBuffer, "DEFAULTDIR=", 11) == 0)
+            else if (strncmp(configLine, "DEFAULTDIR=", 11) == 0)
             {
                 i = 11;
-                while (configBuffer[i] == ' ') i++;                 // remove spaces before string (if present)
-                while (configBuffer[lineLen - 1] == ' ') lineLen--; // remove spaces after string  (if present)
+                while (configLine[i] == ' ') i++;                 // remove spaces before string (if present)
+                while (configLine[lineLen - 1] == ' ') lineLen--; // remove spaces after string  (if present)
 
                 lineLen -= i;
 
                 if (lineLen > 0)
-                    strncpy(ptConfig.defaultDiskOpDir, &configBuffer[i], (lineLen > PATH_MAX_LEN) ? PATH_MAX_LEN : lineLen);
+                    strncpy(ptConfig.defaultDiskOpDir, &configLine[i], (lineLen > PATH_MAX_LEN) ? PATH_MAX_LEN : lineLen);
             }
 
             // A500LOWPASSFILTER
-            else if (strncmp(configBuffer, "A500LOWPASSFILTER=", 18) == 0)
+            else if (strncmp(configLine, "A500LOWPASSFILTER=", 18) == 0)
             {
-                     if (strncmp(&configBuffer[18], "TRUE",  4) == 0) ptConfig.a500LowPassFilter = true;
-                else if (strncmp(&configBuffer[18], "FALSE", 5) == 0) ptConfig.a500LowPassFilter = false;
+                     if (strncmp(&configLine[18], "TRUE",  4) == 0) ptConfig.a500LowPassFilter = true;
+                else if (strncmp(&configLine[18], "FALSE", 5) == 0) ptConfig.a500LowPassFilter = false;
             }
 
             // A4000LOWPASSFILTER (deprecated, same as A500LOWPASSFILTER)
-            else if (strncmp(configBuffer, "A4000LOWPASSFILTER=", 19) == 0)
+            else if (strncmp(configLine, "A4000LOWPASSFILTER=", 19) == 0)
             {
-                     if (strncmp(&configBuffer[19], "TRUE",  4) == 0) ptConfig.a500LowPassFilter = true;
-                else if (strncmp(&configBuffer[19], "FALSE", 5) == 0) ptConfig.a500LowPassFilter = false;
+                     if (strncmp(&configLine[19], "TRUE",  4) == 0) ptConfig.a500LowPassFilter = true;
+                else if (strncmp(&configLine[19], "FALSE", 5) == 0) ptConfig.a500LowPassFilter = false;
             }
 
             // FREQUENCY
-            else if (strncmp(configBuffer, "FREQUENCY=", 10) == 0)
+            else if (strncmp(configLine, "FREQUENCY=", 10) == 0)
             {
-                if (configBuffer[10] != '\0')
-                    ptConfig.soundFrequency = (uint32_t)(CLAMP(atoi(&configBuffer[10]), 32000, 96000));
+                if (configLine[10] != '\0')
+                    ptConfig.soundFrequency = (uint32_t)(CLAMP(atoi(&configLine[10]), 32000, 96000));
             }
 
             // BUFFERSIZE
-            else if (strncmp(configBuffer, "BUFFERSIZE=", 11) == 0)
+            else if (strncmp(configLine, "BUFFERSIZE=", 11) == 0)
             {
-                if (configBuffer[11] != '\0')
-                    ptConfig.soundBufferSize = (uint32_t)(CLAMP(atoi(&configBuffer[11]), 128, 8192));
+                if (configLine[11] != '\0')
+                    ptConfig.soundBufferSize = (uint32_t)(CLAMP(atoi(&configLine[11]), 128, 8192));
             }
 
             // STEREOSEPARATION
-            else if (strncmp(configBuffer, "STEREOSEPARATION=", 17) == 0)
+            else if (strncmp(configLine, "STEREOSEPARATION=", 17) == 0)
             {
-                if (configBuffer[17] != '\0')
-                    ptConfig.stereoSeparation = (int8_t)(CLAMP(atoi(&configBuffer[17]), 0, 100));
+                if (configLine[17] != '\0')
+                    ptConfig.stereoSeparation = (int8_t)(CLAMP(atoi(&configLine[17]), 0, 100));
             }
 
-            configBuffer = strtok(NULL, "\n");
+            configLine = strtok(NULL, "\n");
         }
 
         free(configBuffer);

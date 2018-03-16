@@ -90,9 +90,10 @@
       <DataExecutionPrevention>false</DataExecutionPrevention>
     </Link>
     <PostBuildEvent>
-      <Command>..\..\bintools\xp_pe_patch.exe "..\..\release\protracker.exe" -nb
-..\..\bintools\upx.exe "..\..\release\protracker.exe"</Command>
-      <Message>Patches the release binary to run on Windows XP, then compresses the binary with UPX</Message>
+      <Command>..\..\bintools\upx.exe "..\..\release\protracker.exe"
+..\..\bintools\xp_pe_patch.exe "..\..\release\protracker.exe" -nb
+</Command>
+      <Message> *** will now compress the binary with UPX and patch it to run on Windows XP ***</Message>
     </PostBuildEvent>
     <Manifest>
       <VerboseOutput>false</VerboseOutput>
@@ -101,9 +102,9 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
-      <PreprocessorDefinitions>DEBUG;WIN32;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;HAVE_M_PI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRTDBG_MAP_ALLOC;DEBUG;_DEBUG;WIN32;_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;HAVE_M_PI</PreprocessorDefinitions>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <ExceptionHandling>false</ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>

@@ -1,9 +1,14 @@
-// Very accurate C port of ProTracker 2.3D's replayer by 8bitbubsy, slightly modified.
-// Earlier versions of the PT clone used a completely different and less accurate replayer.
+/* Very accurate C port of ProTracker 2.3D's replayer by 8bitbubsy, slightly modified.
+** Earlier versions of the PT clone used a completely different and less accurate replayer.
+*/
+
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
 #include <math.h>
 #include "pt_header.h"

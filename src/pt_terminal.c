@@ -1,6 +1,10 @@
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #include <stdio.h>
 #include <stdint.h>
-#include <string.h>
 #include <stdarg.h>
 #include <time.h>
 #include <math.h> // for powf()

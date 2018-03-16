@@ -1,7 +1,11 @@
+// for finding memory leaks in debug mode with Visual Studio 
+#if defined _DEBUG && defined _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #include <stdio.h>
 #include <stdint.h>
 #include <ctype.h> // tolower()
-#include <SDL2/SDL.h>
 #ifdef _WIN32
 #include <windows.h>
 #endif
